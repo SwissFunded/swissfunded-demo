@@ -5,28 +5,6 @@ import { TrophyIcon } from '@heroicons/react/24/solid';
 const successfulTraders = [
   {
     id: 1,
-    name: 'Alex Thompson',
-    profit: 125000,
-    winRate: 82.5,
-    profitFactor: 3.2,
-    strategy: 'Price Action',
-    favoritePairs: ['EUR/USD', 'GBP/USD'],
-    image: 'https://randomuser.me/api/portraits/men/32.jpg',
-    rank: 1
-  },
-  {
-    id: 2,
-    name: 'Sarah Chen',
-    profit: 98000,
-    winRate: 78.3,
-    profitFactor: 2.8,
-    strategy: 'Swing Trading',
-    favoritePairs: ['USD/JPY', 'AUD/USD'],
-    image: 'https://randomuser.me/api/portraits/women/44.jpg',
-    rank: 2
-  },
-  {
-    id: 3,
     name: 'Michael Rodriguez',
     profit: 156000,
     winRate: 75.6,
@@ -34,10 +12,21 @@ const successfulTraders = [
     strategy: 'Breakout Trading',
     favoritePairs: ['GBP/JPY', 'EUR/GBP'],
     image: 'https://randomuser.me/api/portraits/men/67.jpg',
-    rank: 3
+    rank: 1
   },
   {
-    id: 4,
+    id: 2,
+    name: 'Alex Thompson',
+    profit: 125000,
+    winRate: 82.5,
+    profitFactor: 3.2,
+    strategy: 'Price Action',
+    favoritePairs: ['EUR/USD', 'GBP/USD'],
+    image: 'https://randomuser.me/api/portraits/men/32.jpg',
+    rank: 2
+  },
+  {
+    id: 3,
     name: 'Emma Wilson',
     profit: 112000,
     winRate: 80.2,
@@ -45,6 +34,17 @@ const successfulTraders = [
     strategy: 'Trend Following',
     favoritePairs: ['USD/CAD', 'NZD/USD'],
     image: 'https://randomuser.me/api/portraits/women/68.jpg',
+    rank: 3
+  },
+  {
+    id: 4,
+    name: 'Sarah Chen',
+    profit: 98000,
+    winRate: 78.3,
+    profitFactor: 2.8,
+    strategy: 'Swing Trading',
+    favoritePairs: ['USD/JPY', 'AUD/USD'],
+    image: 'https://randomuser.me/api/portraits/women/44.jpg',
     rank: 4
   }
 ];
