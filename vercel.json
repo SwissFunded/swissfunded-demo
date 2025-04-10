@@ -1,18 +1,7 @@
 {
   "rewrites": [
-    {
-      "source": "/demo",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/demo/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/demo", "destination": "/" },
+    { "source": "/demo/(.*)", "destination": "/$1" }
   ],
-  "routes": [
-    {
-      "src": "/",
-      "dest": "/demo"
-    }
-  ]
+  "trailingSlash": false
 } 
