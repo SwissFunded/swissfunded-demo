@@ -5,16 +5,18 @@ import { tradeData } from '../../data/tradeData';
 import { getTimeRangeData, calculateStats, getChartData } from '../../utils/tradeDataUtils';
 
 const CustomDot = (props: any) => {
-  const { cx, cy, payload } = props;
+  const { cx, cy, index, payload, data } = props;
+  const isLastDot = index === data.length - 1;
+
   return (
     <circle 
       cx={cx} 
       cy={cy} 
-      r={4} 
-      stroke="#10B981" 
+      r={isLastDot ? 6 : 4} 
+      stroke="#ef4444"
       strokeWidth={2} 
-      fill="#10B981" 
-      fillOpacity={0.2}
+      fill={isLastDot ? "#ef4444" : "#1F2937"}
+      className={isLastDot ? "animate-pulse" : ""}
     />
   );
 };
@@ -131,10 +133,10 @@ const Dashboard: React.FC = () => {
               <Line
                 type="monotone"
                 dataKey="balance"
-                stroke="#10B981"
+                stroke="#ef4444"
                 strokeWidth={2}
                 dot={<CustomDot />}
-                activeDot={{ r: 6, fill: '#10B981' }}
+                activeDot={{ r: 8, fill: '#ef4444' }}
               />
             </LineChart>
           </ResponsiveContainer>
