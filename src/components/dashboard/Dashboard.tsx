@@ -14,6 +14,7 @@ import {
 import ChallengeCard from '../challenge/ChallengeCard';
 import { tradeData } from '../../data/tradeData';
 import { getTimeRangeData, calculateStats, getChartData } from '../../utils/tradeDataUtils';
+import { motion } from 'framer-motion';
 
 ChartJS.register(
   CategoryScale,
@@ -187,74 +188,91 @@ const Dashboard: React.FC = () => {
   } as const;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-background-light p-6 rounded-xl">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="p-6 space-y-6"
+    >
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+      >
+        <motion.div 
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="bg-background-light p-6 rounded-xl"
+        >
           <h3 className="text-lg font-medium text-text-muted mb-2">Total Trades</h3>
           <p className="text-2xl font-bold">{stats.totalTrades}</p>
           <p className="text-sm text-text-muted mt-1">
             {stats.wins} Wins / {stats.losses} Losses
           </p>
-        </div>
-        <div className="bg-background-light p-6 rounded-xl">
+        </motion.div>
+        <motion.div 
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="bg-background-light p-6 rounded-xl"
+        >
           <h3 className="text-lg font-medium text-text-muted mb-2">Win Rate</h3>
           <p className="text-2xl font-bold">{stats.winRate.toFixed(1)}%</p>
-        </div>
-        <div className="bg-background-light p-6 rounded-xl">
+        </motion.div>
+        <motion.div 
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="bg-background-light p-6 rounded-xl"
+        >
           <h3 className="text-lg font-medium text-text-muted mb-2">Total PnL</h3>
           <p className={`text-2xl font-bold ${stats.totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
             ${stats.totalPnL.toLocaleString()}
           </p>
-        </div>
-        <div className="bg-background-light p-6 rounded-xl">
+        </motion.div>
+        <motion.div 
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="bg-background-light p-6 rounded-xl"
+        >
           <h3 className="text-lg font-medium text-text-muted mb-2">Percentage Gain</h3>
           <p className={`text-2xl font-bold ${stats.percentageGain >= 0 ? 'text-green-500' : 'text-red-500'}`}>
             {stats.percentageGain.toFixed(2)}%
           </p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      <div className="bg-background-light rounded-xl p-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="bg-background-light rounded-xl p-6"
+      >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold">Balance History</h2>
           <div className="flex gap-2">
-            <button
-              onClick={() => setTimeRange('1d')}
-              className={`px-3 py-1 rounded ${timeRange === '1d' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
-            >
-              1D
-            </button>
-            <button
-              onClick={() => setTimeRange('1w')}
-              className={`px-3 py-1 rounded ${timeRange === '1w' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
-            >
-              1W
-            </button>
-            <button
-              onClick={() => setTimeRange('1m')}
-              className={`px-3 py-1 rounded ${timeRange === '1m' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
-            >
-              1M
-            </button>
-            <button
-              onClick={() => setTimeRange('3m')}
-              className={`px-3 py-1 rounded ${timeRange === '3m' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
-            >
-              3M
-            </button>
-            <button
-              onClick={() => setTimeRange('6m')}
-              className={`px-3 py-1 rounded ${timeRange === '6m' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
-            >
-              6M
-            </button>
+            {['1d', '1w', '1m', '3m', '6m'].map((range) => (
+              <motion.button
+                key={range}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setTimeRange(range as any)}
+                className={`px-3 py-1 rounded ${timeRange === range ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
+              >
+                {range.toUpperCase()}
+              </motion.button>
+            ))}
           </div>
         </div>
-        <div className="h-[400px] w-full">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="h-[400px] w-full"
+        >
           <Line data={chartData} options={chartOptions} />
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 
