@@ -21,39 +21,20 @@ const AppContent: React.FC = () => {
       <div className="relative flex">
         <Sidebar />
         <div className="flex-1 ml-64 mt-[72px]">
-          <AnimatePresence>
-            <Routes location={location} key={location.pathname}>
-              <Route path="/" element={
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Dashboard />
-                </motion.div>
-              } />
-              <Route path="/statistics" element={
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <DetailedStats />
-                </motion.div>
-              } />
-              <Route path="/tutorials" element={
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Tutorials />
-                </motion.div>
-              } />
-            </Routes>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Routes location={location}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/statistics" element={<DetailedStats />} />
+                <Route path="/tutorials" element={<Tutorials />} />
+              </Routes>
+            </motion.div>
           </AnimatePresence>
         </div>
       </div>
