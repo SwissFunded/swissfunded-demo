@@ -305,262 +305,146 @@ const CustomDot = (props: any) => {
 };
 
 const Dashboard: React.FC = () => {
-  type TimePeriod = '1D' | '1W' | '1M' | '3M' | 'ALL';
-  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('ALL');
-  const [showTradeHistory, setShowTradeHistory] = useState(false);
-  const [selectedMetric, setSelectedMetric] = useState('balance');
+  const [timeRange, setTimeRange] = useState<number>(30); // Default to 30 days
 
-  const daysMap = {
-    '1D': 1,
-    '1W': 7,
-    '1M': 30,
-    '3M': 90,
-    'ALL': Infinity
-  };
-
-  const currentData = useMemo(() => {
-    return getTimeRangeData(tradeData, daysMap[selectedPeriod]);
-  }, [selectedPeriod]);
-
-  const stats = useMemo(() => {
-    return calculateStats(currentData);
-  }, [currentData]);
-
-  const chartData = useMemo(() => {
-    return getChartData(currentData);
-  }, [currentData]);
-
-  // Calculate performance metrics from real data
-  const totalTrades = stats.totalTrades;
-  const averageWinRate = stats.winRate;
-  const totalProfit = stats.totalPnL;
-  const averageDailyProfit = totalProfit / (currentData.length - 1);
-  const largestDailyProfit = Math.max(...currentData.map((trade, i) => 
-    i > 0 ? trade.balance - currentData[i - 1].balance : 0
-  ));
-  const averageTradesPerDay = totalTrades / (currentData.length - 1);
-  const profitableDays = currentData.filter((trade, i) => 
-    i > 0 && trade.balance > currentData[i - 1].balance
-  ).length;
-  const winRateDays = currentData.filter(trade => trade.pnl > 0).length;
-  const averageDailyWinRate = (winRateDays / currentData.length) * 100;
-
-  const riskMetrics = {
-    maxDrawdown: Math.min(...currentData.map(day => 
-      ((day.balance - Math.max(...currentData.slice(0, currentData.indexOf(day) + 1).map(d => d.balance))) / 
-      Math.max(...currentData.slice(0, currentData.indexOf(day) + 1).map(d => d.balance))) * 100
-    )),
-    averageDailyLoss: currentData.filter(day => day.balance < currentData[currentData.indexOf(day) - 1]?.balance)
-      .reduce((sum, day, i, arr) => sum + (day.balance - currentData[currentData.indexOf(day) - 1]?.balance), 0) / 
-      currentData.filter(day => day.balance < currentData[currentData.indexOf(day) - 1]?.balance).length,
-    consecutiveLosses: Math.max(...currentData.reduce((acc, day) => {
-      if (day.balance < currentData[currentData.indexOf(day) - 1]?.balance) {
-        acc[acc.length - 1]++;
-      } else {
-        acc.push(0);
-      }
-      return acc;
-    }, [0]))
-  };
+  // Get data for the selected time range
+  const filteredData = useMemo(() => getTimeRangeData(tradeData, timeRange), [timeRange]);
+  
+  // Calculate statistics
+  const stats = useMemo(() => calculateStats(filteredData), [filteredData]);
+  
+  // Prepare chart data
+  const chartData = useMemo(() => getChartData(filteredData), [filteredData]);
 
   return (
-    <div className="p-6 bg-[#0a0a0a] min-h-screen">
+    <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-semibold text-white font-montserrat">Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={() => setShowTradeHistory(!showTradeHistory)}
-                className="btn bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] transition-colors duration-300 px-4 py-2 rounded-lg flex items-center"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                Trade History
-              </button>
-              <button className="btn bg-[#c0392b] text-white hover:bg-[#a93226] transition-colors duration-300 px-4 py-2 rounded-lg flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                New Challenge
-              </button>
-            </div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
+        
+        {/* Time Range Selector */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Time Range (days)
+          </label>
+          <select
+            value={timeRange}
+            onChange={(e) => setTimeRange(Number(e.target.value))}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          >
+            <option value={7}>7 days</option>
+            <option value={30}>30 days</option>
+            <option value={90}>90 days</option>
+            <option value={180}>180 days</option>
+          </select>
+        </div>
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-gray-500">Total Trades</h3>
+            <p className="text-2xl font-semibold text-gray-900">{stats.totalTrades}</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-gray-500">Win Rate</h3>
+            <p className="text-2xl font-semibold text-gray-900">{stats.winRate.toFixed(1)}%</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-gray-500">Total PnL</h3>
+            <p className="text-2xl font-semibold text-gray-900">${stats.totalPnL.toFixed(2)}</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-medium text-gray-500">Percentage Gain</h3>
+            <p className="text-2xl font-semibold text-gray-900">{stats.percentageGain.toFixed(2)}%</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="card bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg lg:col-span-2">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <p className="text-[#cccccc] text-sm">Account Balance</p>
-                  <p className="text-3xl font-bold text-[#e74c3c] mt-1">${currentData[currentData.length - 1].balance.toLocaleString()}</p>
-                  <p className="text-sm text-[#cccccc] mt-1">+20% from start</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {Object.keys(daysMap).map((period) => (
-                    <button
-                      key={period}
-                      onClick={() => setSelectedPeriod(period as TimePeriod)}
-                      className={`px-3 py-1 rounded-lg text-sm ${
-                        selectedPeriod === period
-                          ? 'bg-[#e74c3c] text-white'
-                          : 'bg-[#2a2a2a] text-[#cccccc] hover:bg-[#3a3a3a]'
-                      }`}
-                    >
-                      {period}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid 
-                      strokeDasharray="0"
-                      vertical={false}
-                      horizontal={true}
-                      stroke="rgba(255, 255, 255, 0.05)"
-                    />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#888888"
-                      tick={{ fill: '#888888' }}
-                    />
-                    <YAxis 
-                      stroke="#888888"
-                      tick={{ fill: '#888888' }}
-                      tickFormatter={(value) => `$${value.toLocaleString()}`}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="balance" 
-                      stroke="#c0392b"
-                      strokeWidth={2}
-                      dot={{
-                        r: 4,
-                        fill: '#c0392b',
-                        stroke: '#c0392b',
-                        strokeWidth: 2
-                      }}
-                      activeDot={{
-                        r: 6,
-                        fill: '#c0392b',
-                        stroke: '#c0392b',
-                        strokeWidth: 2
-                      }}
-                      animationDuration={1500}
-                      animationEasing="ease-in-out"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-          <div className="card bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <p className="text-[#cccccc] text-sm">Trading Performance</p>
-                  <p className="text-3xl font-bold text-[#e74c3c] mt-1">{averageWinRate.toFixed(1)}% Win Rate</p>
-                </div>
-                <div className="h-12 w-12 rounded-full bg-[#e74c3c]/10 flex items-center justify-center">
-                  <svg className="h-6 w-6 text-[#e74c3c]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-[#2a2a2a] p-4 rounded-lg">
-                    <p className="text-[#cccccc] text-sm">Max Drawdown</p>
-                    <p className="text-[#e74c3c] font-medium">{Math.abs(riskMetrics.maxDrawdown).toFixed(2)}%</p>
-                  </div>
-                  <div className="bg-[#2a2a2a] p-4 rounded-lg">
-                    <p className="text-[#cccccc] text-sm">Avg Daily Loss</p>
-                    <p className="text-[#e74c3c] font-medium">${Math.abs(riskMetrics.averageDailyLoss).toFixed(2)}</p>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[#cccccc]">Total Trades</span>
-                  <span className="text-white font-medium">{totalTrades}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[#cccccc]">Average Trades/Day</span>
-                  <span className="text-white font-medium">{averageTradesPerDay.toFixed(1)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[#cccccc]">Profitable Days</span>
-                  <span className="text-[#e74c3c] font-medium">{profitableDays}/{currentData.length - 1}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[#cccccc]">Consecutive Losses</span>
-                  <span className="text-[#e74c3c] font-medium">{riskMetrics.consecutiveLosses}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[#cccccc]">Total Profit</span>
-                  <span className="text-[#e74c3c] font-medium">${totalProfit.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
+        {/* Balance Chart */}
+        <div className="bg-white p-4 rounded-lg shadow mb-6">
+          <h2 className="text-lg font-medium text-gray-900 mb-4">Balance History</h2>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="balance" stroke="#8884d8" />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {showTradeHistory && (
-          <div className="card bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg mb-8">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-medium text-white font-montserrat">Trade History</h2>
-                <button 
-                  onClick={() => setShowTradeHistory(false)}
-                  className="text-[#cccccc] hover:text-white"
-                >
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left text-[#cccccc] border-b border-[#2a2a2a]">
-                      <th className="pb-4">Date</th>
-                      <th className="pb-4">Instrument</th>
-                      <th className="pb-4">Type</th>
-                      <th className="pb-4">Size</th>
-                      <th className="pb-4">Entry</th>
-                      <th className="pb-4">Exit</th>
-                      <th className="pb-4">P/L</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentData.map((day, index) => (
-                      <tr key={index} className="border-b border-[#2a2a2a]">
-                        <td className="py-4 text-white">{day.date}</td>
-                        <td className="py-4 text-white">EURUSD</td>
-                        <td className="py-4 text-white">Long</td>
-                        <td className="py-4 text-white">0.5</td>
-                        <td className="py-4 text-white">1.0850</td>
-                        <td className="py-4 text-white">1.0900</td>
-                        <td className="py-4 text-[#e74c3c]">+$50.00</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="card bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-medium text-white font-montserrat">Active Challenge</h2>
-            </div>
-            <ChallengeCard challenge={mockChallenge} />
-          </div>
+        {/* Challenge Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <ChallengeCard
+            challenge={{
+              platform: "FTMO",
+              accountId: "CH001",
+              type: "Express",
+              trades: 45,
+              daysPassed: 15,
+              daysLeft: 15,
+              status: "Active",
+              profitTarget: 10,
+              maxDrawdown: 5,
+              dailyLossLimit: 3,
+              currentProfit: 7.5,
+              currentDrawdown: 1.2,
+              dailyLossUsed: 0.8,
+              instruments: ["EURUSD", "GBPUSD", "USDJPY"],
+              averageTradeSize: 0.5,
+              winRate: "65%",
+              profitFactor: 2.1,
+              bestDay: 250,
+              worstDay: -150
+            }}
+          />
+          <ChallengeCard
+            challenge={{
+              platform: "FTMO",
+              accountId: "CH002",
+              type: "Normal",
+              trades: 120,
+              daysPassed: 30,
+              daysLeft: 0,
+              status: "Completed",
+              profitTarget: 10,
+              maxDrawdown: 5,
+              dailyLossLimit: 3,
+              currentProfit: 12.5,
+              currentDrawdown: 2.1,
+              dailyLossUsed: 1.5,
+              instruments: ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD"],
+              averageTradeSize: 0.3,
+              winRate: "72%",
+              profitFactor: 2.8,
+              bestDay: 350,
+              worstDay: -120
+            }}
+          />
+          <ChallengeCard
+            challenge={{
+              platform: "FTMO",
+              accountId: "CH003",
+              type: "Express",
+              trades: 65,
+              daysPassed: 20,
+              daysLeft: 0,
+              status: "Failed",
+              profitTarget: 10,
+              maxDrawdown: 5,
+              dailyLossLimit: 3,
+              currentProfit: 8.5,
+              currentDrawdown: 5.2,
+              dailyLossUsed: 3.0,
+              instruments: ["EURUSD", "GBPUSD"],
+              averageTradeSize: 0.4,
+              winRate: "58%",
+              profitFactor: 1.5,
+              bestDay: 280,
+              worstDay: -200
+            }}
+          />
         </div>
       </div>
     </div>
