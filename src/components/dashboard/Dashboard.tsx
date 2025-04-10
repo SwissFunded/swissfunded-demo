@@ -60,7 +60,13 @@ const Dashboard: React.FC = () => {
           pointBackgroundColor: '#ef4444',
           pointBorderColor: '#ef4444',
           pointBorderWidth: 2,
-          pointRadius: 4,
+          pointRadius: (context: any) => {
+            const index = context.dataIndex;
+            if (index === 0) return 4; // Show first point
+            if (index === currentData.length - 1) return 4; // Show last point
+            // Show point only if balance changed (trade occurred)
+            return currentData[index].balance !== currentData[index - 1].balance ? 4 : 0;
+          },
           pointHoverRadius: 6,
           fill: true,
           tension: 0.4,
