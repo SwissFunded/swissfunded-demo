@@ -4,7 +4,6 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
 } from '@heroicons/react/24/outline';
-import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,9 +11,11 @@ import {
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  PointElement,
+  LineElement,
 } from 'chart.js';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { Line } from 'react-chartjs-2';
 import { tradeData } from '../../data/tradeData';
 import { getTimeRangeData, calculateStats, getChartData } from '../../utils/tradeDataUtils';
 
@@ -22,6 +23,8 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend
@@ -46,7 +49,20 @@ const DetailedStats: React.FC = () => {
   }, [currentData]);
 
   const chartData = useMemo(() => {
-    return getChartData(currentData);
+    const data = getChartData(currentData);
+    return {
+      labels: data.map(d => d.date),
+      datasets: [
+        {
+          label: 'Balance',
+          data: data.map(d => d.balance),
+          borderColor: '#10B981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          tension: 0.4,
+          fill: true,
+        }
+      ]
+    };
   }, [currentData]);
 
   // Account data based on the latest trade data
@@ -77,26 +93,42 @@ const DetailedStats: React.FC = () => {
     plugins: {
       legend: {
         display: false
+      },
+      tooltip: {
+        mode: 'index' as const,
+        intersect: false,
       }
     },
     scales: {
       y: {
+        type: 'linear' as const,
         grid: {
           color: 'rgba(255, 255, 255, 0.05)',
         },
         ticks: {
           color: 'rgba(255, 255, 255, 0.5)',
+          callback: function(value: string | number) {
+            return `$${Number(value).toLocaleString()}`;
+          }
         }
       },
       x: {
+        type: 'category' as const,
         grid: {
           display: false
         },
         ticks: {
           color: 'rgba(255, 255, 255, 0.5)',
+          maxRotation: 0,
+          autoSkip: true,
+          maxTicksLimit: 10
         }
       }
-    }
+    },
+    interaction: {
+      intersect: false,
+      mode: 'index' as const,
+    },
   };
 
   return (
@@ -181,27 +213,7 @@ const DetailedStats: React.FC = () => {
               </button>
             </div>
             <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
-                  <XAxis 
-                    dataKey="date" 
-                    stroke="rgba(255, 255, 255, 0.5)"
-                    tick={{ fill: 'rgba(255, 255, 255, 0.5)' }}
-                  />
-                  <YAxis 
-                    stroke="rgba(255, 255, 255, 0.5)"
-                    tick={{ fill: 'rgba(255, 255, 255, 0.5)' }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="balance"
-                    stroke="#10B981"
-                    dot={false}
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <Line data={chartData} options={chartOptions} />
             </div>
           </div>
         </div>
