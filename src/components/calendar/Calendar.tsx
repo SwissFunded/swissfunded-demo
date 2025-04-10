@@ -18,7 +18,7 @@ const API_URL = 'https://swissfunded-demo-server.vercel.app/api/forex-news';
 const CACHE_DURATION = 5 * 60 * 1000;
 
 const Calendar: React.FC = () => {
-  const [events, setEvents] = useState<NewsEvent[]>([]);
+  const [newsEvents, setNewsEvents] = useState<NewsEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
@@ -26,36 +26,36 @@ const Calendar: React.FC = () => {
   const maxRetries = 3;
 
   // Filter states
-  const [selectedCurrency, setSelectedCurrency] = useState<string>('all');
-  const [selectedImpact, setSelectedImpact] = useState<string>('all');
-  const [selectedEvent, setSelectedEvent] = useState<string>('all');
-  const [dateRange, setDateRange] = useState<{ start: string; end: string }>({
-    start: new Date().toISOString().split('T')[0],
-    end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
+  const [selectedImpact, setSelectedImpact] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState({
+    start: '',
+    end: ''
   });
 
   // Get unique values for filters
   const uniqueCurrencies = useMemo(() => 
-    Array.from(new Set(events.map(event => event.currency))).sort(),
-    [events]
+    Array.from(new Set(newsEvents.map(event => event.currency))).sort(),
+    [newsEvents]
   );
   
   const uniqueImpacts = useMemo(() => 
-    Array.from(new Set(events.map(event => event.impact))).sort(),
-    [events]
+    Array.from(new Set(newsEvents.map(event => event.impact))).sort(),
+    [newsEvents]
   );
   
   const uniqueEvents = useMemo(() => 
-    Array.from(new Set(events.map(event => event.event))).sort(),
-    [events]
+    Array.from(new Set(newsEvents.map(event => event.event))).sort(),
+    [newsEvents]
   );
 
   // Filter events based on selected filters
   const filteredEvents = useMemo(() => {
-    return events.filter(event => {
-      const matchesCurrency = selectedCurrency === 'all' || event.currency === selectedCurrency;
-      const matchesImpact = selectedImpact === 'all' || event.impact === selectedImpact;
-      const matchesEvent = selectedEvent === 'all' || event.event === selectedEvent;
+    return newsEvents.filter(event => {
+      const matchesCurrency = selectedCurrency === null || event.currency === selectedCurrency;
+      const matchesImpact = selectedImpact === null || event.impact === selectedImpact;
+      const matchesEvent = selectedEvent === null || event.event === selectedEvent;
       const eventDate = new Date(event.date);
       const startDate = new Date(dateRange.start);
       const endDate = new Date(dateRange.end);
@@ -63,14 +63,14 @@ const Calendar: React.FC = () => {
       
       return matchesCurrency && matchesImpact && matchesEvent && matchesDate;
     });
-  }, [events, selectedCurrency, selectedImpact, selectedEvent, dateRange]);
+  }, [newsEvents, selectedCurrency, selectedImpact, selectedEvent, dateRange]);
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
         // Check cache first
         if (cache.current && Date.now() - cache.current.timestamp < CACHE_DURATION) {
-          setEvents(cache.current.data);
+          setNewsEvents(cache.current.data);
           setLoading(false);
           return;
         }
@@ -84,7 +84,7 @@ const Calendar: React.FC = () => {
         // Cache the data
         cache.current = { data, timestamp: Date.now() };
         
-        setEvents(data);
+        setNewsEvents(data);
         setError(null);
         setRetryCount(0);
       } catch (err) {
@@ -149,118 +149,135 @@ const Calendar: React.FC = () => {
   }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-[#cccccc]">Currency Pair</label>
-          <select
-            value={selectedCurrency}
-            onChange={(e) => setSelectedCurrency(e.target.value)}
-            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-4 py-2.5 focus:border-primary focus:ring-primary focus:ring-1 transition-colors appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNC42NjY3NSAxMi4zMzM0TDEyLjMzMzQgNC42NjY3NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik00LjY2Njc1IDQuNjY2NzVMMTIuMzMzNCAxMi4zMzM0IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+')] bg-no-repeat bg-[right_1rem_center]"
-          >
-            <option value="all" className="bg-[#2a2a2a]">All Pairs</option>
-            {uniqueCurrencies.map(currency => (
-              <option key={currency} value={currency} className="bg-[#2a2a2a]">{currency}</option>
-            ))}
-          </select>
-        </div>
+    <div className="min-h-screen bg-[#1a1a1a] text-white p-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8">Forex News Calendar</h1>
         
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-[#cccccc]">Impact</label>
-          <select
-            value={selectedImpact}
-            onChange={(e) => setSelectedImpact(e.target.value)}
-            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-4 py-2.5 focus:border-primary focus:ring-primary focus:ring-1 transition-colors appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNC42NjY3NSAxMi4zMzM0TDEyLjMzMzQgNC42NjY3NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik00LjY2Njc1IDQuNjY2NzVMMTIuMzMzNCAxMi4zMzM0IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+')] bg-no-repeat bg-[right_1rem_center]"
-          >
-            <option value="all" className="bg-[#2a2a2a]">All Impacts</option>
-            {uniqueImpacts.map(impact => (
-              <option key={impact} value={impact} className="bg-[#2a2a2a]">{impact}</option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-[#cccccc]">Event</label>
-          <select
-            value={selectedEvent}
-            onChange={(e) => setSelectedEvent(e.target.value)}
-            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-4 py-2.5 focus:border-primary focus:ring-primary focus:ring-1 transition-colors appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNC42NjY3NSAxMi4zMzM0TDEyLjMzMzQgNC42NjY3NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik00LjY2Njc1IDQuNjY2NzVMMTIuMzMzNCAxMi4zMzM0IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+')] bg-no-repeat bg-[right_1rem_center]"
-          >
-            <option value="all" className="bg-[#2a2a2a]">All Events</option>
-            {uniqueEvents.map(event => (
-              <option key={event} value={event} className="bg-[#2a2a2a]">{event}</option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-[#cccccc]">Date Range</label>
-          <div className="flex space-x-3">
-            <div className="flex-1">
-              <input
-                type="date"
-                value={dateRange.start}
-                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-4 py-2.5 focus:border-primary focus:ring-primary focus:ring-1 transition-colors"
-              />
+        {/* Filters */}
+        <div className="bg-[#2a2a2a] rounded-lg p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Currency Pairs Filter */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-300">Currency Pairs</label>
+              <div className="flex flex-wrap gap-2">
+                {['All', 'EUR/USD', 'GBP/USD', 'USD/JPY', 'AUD/USD', 'USD/CAD'].map((pair) => (
+                  <button
+                    key={pair}
+                    onClick={() => setSelectedCurrency(pair === 'All' ? null : pair)}
+                    className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
+                      (selectedCurrency === pair || (selectedCurrency === null && pair === 'All'))
+                        ? 'bg-primary text-white'
+                        : 'bg-[#1a1a1a] text-gray-300 hover:bg-[#333333]'
+                    }`}
+                  >
+                    {pair}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex-1">
-              <input
-                type="date"
-                value={dateRange.end}
-                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-4 py-2.5 focus:border-primary focus:ring-primary focus:ring-1 transition-colors"
-              />
+
+            {/* Impact Filter */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-300">Impact</label>
+              <div className="flex flex-wrap gap-2">
+                {['All', 'High', 'Medium', 'Low'].map((impact) => (
+                  <button
+                    key={impact}
+                    onClick={() => setSelectedImpact(impact === 'All' ? null : impact)}
+                    className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
+                      (selectedImpact === impact || (selectedImpact === null && impact === 'All'))
+                        ? 'bg-primary text-white'
+                        : 'bg-[#1a1a1a] text-gray-300 hover:bg-[#333333]'
+                    }`}
+                  >
+                    {impact}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Event Type Filter */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-300">Event Type</label>
+              <div className="flex flex-wrap gap-2">
+                {['All', 'Interest Rate Decision', 'GDP', 'CPI', 'Employment Change', 'Retail Sales'].map((event) => (
+                  <button
+                    key={event}
+                    onClick={() => setSelectedEvent(event === 'All' ? null : event)}
+                    className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
+                      (selectedEvent === event || (selectedEvent === null && event === 'All'))
+                        ? 'bg-primary text-white'
+                        : 'bg-[#1a1a1a] text-gray-300 hover:bg-[#333333]'
+                    }`}
+                  >
+                    {event}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Date Range Filter */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-300">Date Range</label>
+              <div className="flex gap-2">
+                <input
+                  type="date"
+                  value={dateRange.start}
+                  onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                  className="w-full px-3 py-1.5 rounded-md bg-[#1a1a1a] border border-[#333333] text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+                <input
+                  type="date"
+                  value={dateRange.end}
+                  onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                  className="w-full px-3 py-1.5 rounded-md bg-[#1a1a1a] border border-[#333333] text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Calendar Table */}
-      <div className="overflow-x-auto bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
-        <table className="min-w-full divide-y divide-[#2a2a2a]">
-          <thead className="bg-[#2a2a2a]">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Time</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Currency</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Impact</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Event</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Forecast</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Previous</th>
-            </tr>
-          </thead>
-          <tbody className="bg-[#1a1a1a] divide-y divide-[#2a2a2a]">
-            {filteredEvents.map((event, index) => (
-              <motion.tr
-                key={`${event.date}-${event.time}-${index}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="hover:bg-[#2a2a2a]"
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.date}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.time}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{event.currency}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getImpactColor(event.impact)}`}>
-                    {event.impact}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.event}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.forecast}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.previous}</td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </table>
+        {/* Calendar Table */}
+        <div className="overflow-x-auto bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
+          <table className="min-w-full divide-y divide-[#2a2a2a]">
+            <thead className="bg-[#2a2a2a]">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Time</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Currency</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Impact</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Event</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Forecast</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Previous</th>
+              </tr>
+            </thead>
+            <tbody className="bg-[#1a1a1a] divide-y divide-[#2a2a2a]">
+              {filteredEvents.map((event, index) => (
+                <motion.tr
+                  key={`${event.date}-${event.time}-${index}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="hover:bg-[#2a2a2a]"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.date}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.time}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{event.currency}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getImpactColor(event.impact)}`}>
+                      {event.impact}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.event}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.forecast}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.previous}</td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
