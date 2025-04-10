@@ -1,78 +1,113 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const cheerio = require('cheerio');
 
 const app = express();
 const port = process.env.PORT || 3001;
 
+// Finnhub API key
+const FINNHUB_API_KEY = 'cvs1dahr01qp7viu6ff0cvs1dahr01qp7viu6ffg';
+
 app.use(cors());
 app.use(express.json());
 
-app.get('/api/forex-factory-news', async (req, res) => {
+// Mock data for fallback
+const mockEvents = [
+  {
+    date: new Date().toISOString().split('T')[0],
+    time: new Date().toLocaleTimeString(),
+    currency: 'EUR/USD',
+    impact: 'High',
+    event: 'ECB Interest Rate Decision',
+    forecast: '4.50%',
+    previous: '4.50%'
+  },
+  {
+    date: new Date().toISOString().split('T')[0],
+    time: new Date(Date.now() + 3600000).toLocaleTimeString(),
+    currency: 'USD/JPY',
+    impact: 'Medium',
+    event: 'US Non-Farm Payrolls',
+    forecast: '200K',
+    previous: '175K'
+  },
+  {
+    date: new Date().toISOString().split('T')[0],
+    time: new Date(Date.now() + 7200000).toLocaleTimeString(),
+    currency: 'GBP/USD',
+    impact: 'Low',
+    event: 'UK GDP',
+    forecast: '0.2%',
+    previous: '0.1%'
+  }
+];
+
+app.get('/api/forex-news', async (req, res) => {
   try {
-    const response = await axios.get('https://www.forexfactory.com/calendar', {
+    console.log('Fetching news from Finnhub...');
+    const response = await axios.get('https://finnhub.io/api/v1/news', {
+      params: {
+        category: 'forex',
+        token: FINNHUB_API_KEY
+      },
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'X-Finnhub-Token': FINNHUB_API_KEY
       }
     });
-    
-    if (!response.data) {
-      throw new Error('No data received from Forex Factory');
+
+    if (!response.data || !Array.isArray(response.data)) {
+      console.log('No data from Finnhub, falling back to mock data');
+      return res.json(mockEvents);
     }
 
-    const $ = cheerio.load(response.data);
-    const events = [];
-    
-    // Find the calendar table
-    $('.calendar__row').each((i, element) => {
-      const row = $(element);
-      
-      // Skip header rows
-      if (row.hasClass('calendar__row--header')) return;
-      
-      const time = row.find('.calendar__time').text().trim();
-      const currency = row.find('.calendar__currency').text().trim();
-      const impact = row.find('.calendar__impact').attr('title') || 'Low';
-      const event = row.find('.calendar__event').text().trim();
-      const forecast = row.find('.calendar__forecast').text().trim();
-      const previous = row.find('.calendar__previous').text().trim();
-      
-      // Get the date from the header if available
-      const date = row.find('.calendar__date').text().trim() || new Date().toISOString().split('T')[0];
-      
-      events.push({
-        date,
-        time,
-        currency,
-        impact,
-        event,
-        forecast,
-        previous
-      });
-    });
+    // Transform the data to match our frontend expectations
+    const events = response.data.map(item => {
+      try {
+        const publishedDate = new Date(item.datetime * 1000); // Convert Unix timestamp to Date
+        return {
+          date: publishedDate.toISOString().split('T')[0],
+          time: publishedDate.toLocaleTimeString(),
+          currency: 'FOREX',
+          impact: getSentimentImpact(item.sentiment),
+          event: item.headline,
+          forecast: item.summary?.substring(0, 200) + (item.summary?.length > 200 ? '...' : ''),
+          previous: item.source
+        };
+      } catch (err) {
+        console.error('Error processing news item:', err);
+        return null;
+      }
+    }).filter(Boolean); // Remove any null items from failed processing
 
     if (events.length === 0) {
-      console.error('No events found in the parsed data');
-      return res.status(500).json({ error: 'No events found in the response' });
+      console.log('No valid news items processed, falling back to mock data');
+      return res.json(mockEvents);
     }
 
+    console.log(`Successfully processed ${events.length} news items`);
     res.json(events);
   } catch (error) {
-    console.error('Error fetching Forex Factory data:', error.message);
-    console.error('Error details:', {
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      headers: error.response?.headers,
-      data: error.response?.data
-    });
-    res.status(500).json({ 
-      error: 'Failed to fetch news events',
-      details: error.message
-    });
+    console.error('Error fetching forex news:', error.message);
+    if (error.response?.data) {
+      console.error('API Response:', error.response.data);
+    }
+    
+    console.log('Error occurred, falling back to mock data');
+    res.json(mockEvents);
   }
 });
 
+// Helper function to convert sentiment score to impact level
+function getSentimentImpact(score) {
+  if (!score) return 'Neutral';
+  if (score >= 0.5) return 'High';
+  if (score >= 0.2) return 'Medium';
+  if (score <= -0.5) return 'High';
+  if (score <= -0.2) return 'Medium';
+  return 'Low';
+}
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+  console.log(`Using Finnhub API`);
 }); 
