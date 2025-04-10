@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -13,7 +13,7 @@ import {
 } from 'chart.js';
 import ChallengeCard from '../challenge/ChallengeCard';
 import { tradeData } from '../../data/tradeData';
-import { getTimeRangeData, calculateStats, getChartData } from '../../utils/tradeDataUtils';
+import { getTimeRangeData, calculateStats } from '../../utils/tradeDataUtils';
 import { motion } from 'framer-motion';
 
 ChartJS.register(
@@ -30,13 +30,13 @@ ChartJS.register(
 const Dashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState<'1d' | '1w' | '1m' | '3m' | '6m'>('1m');
 
-  const daysMap = {
+  const daysMap = useMemo(() => ({
     '1d': 1,
     '1w': 7,
     '1m': 30,
     '3m': 90,
     '6m': 180
-  };
+  }), []);
 
   const currentData = useMemo(() => {
     return getTimeRangeData(tradeData, daysMap[timeRange]);

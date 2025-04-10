@@ -35,10 +35,22 @@ const AppContent: React.FC = () => {
         <Sidebar />
         <div className="flex-1 ml-64 mt-[72px]">
           <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
-              <Route path="/statistics" element={<PageTransition><DetailedStats /></PageTransition>} />
-              <Route path="/tutorials" element={<PageTransition><Tutorials /></PageTransition>} />
+            <Routes>
+              <Route path="/" element={
+                <PageTransition>
+                  <Dashboard />
+                </PageTransition>
+              } />
+              <Route path="/statistics" element={
+                <PageTransition>
+                  <DetailedStats />
+                </PageTransition>
+              } />
+              <Route path="/tutorials" element={
+                <PageTransition>
+                  <Tutorials />
+                </PageTransition>
+              } />
             </Routes>
           </AnimatePresence>
         </div>
