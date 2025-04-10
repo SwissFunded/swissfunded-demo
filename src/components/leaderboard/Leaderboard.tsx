@@ -59,9 +59,9 @@ const Leaderboard: React.FC = () => {
             >
               {/* Rank Badge */}
               <div className={`absolute -top-4 -right-4 w-16 h-16 rounded-full flex items-center justify-center ${
-                index === 1 ? 'bg-[#FFD700]' : index === 0 ? 'bg-[#C0C0C0]' : 'bg-[#CD7F32]'
+                trader.rank === 1 ? 'bg-[#FFD700]' : trader.rank === 2 ? 'bg-[#C0C0C0]' : 'bg-[#CD7F32]'
               }`}>
-                <span className="text-2xl font-bold text-background">{index + 1}</span>
+                <span className="text-2xl font-bold text-background">{trader.rank}</span>
               </div>
 
               <div className="flex flex-col items-center">
@@ -74,7 +74,7 @@ const Leaderboard: React.FC = () => {
                 <p className="text-sm text-text-muted mb-2">{trader.strategy}</p>
                 <div className="flex items-center gap-2 mb-4">
                   <TrophyIcon className={`w-5 h-5 ${
-                    index === 1 ? 'text-[#FFD700]' : index === 0 ? 'text-[#C0C0C0]' : 'text-[#CD7F32]'
+                    trader.rank === 1 ? 'text-[#FFD700]' : trader.rank === 2 ? 'text-[#C0C0C0]' : 'text-[#CD7F32]'
                   }`} />
                   <span className="text-green-500 font-medium">${trader.profit.toLocaleString()}</span>
                 </div>
