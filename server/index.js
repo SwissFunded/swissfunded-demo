@@ -1,11 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const Parser = require('rss-parser');
 
 const app = express();
 const port = process.env.PORT || 3001;
-const parser = new Parser();
 
 // Configure CORS
 const corsOptions = {
@@ -71,42 +69,38 @@ const mockEvents = [
   }
 ];
 
-// Helper function to determine impact based on title and description
-function determineImpact(title, description) {
-  const highImpactTerms = ['rate decision', 'fed', 'fomc', 'nfp', 'non-farm', 'gdp', 'cpi', 'inflation'];
-  const mediumImpactTerms = ['pmi', 'retail sales', 'employment', 'trade balance', 'manufacturing'];
-  
-  const text = (title + ' ' + description).toLowerCase();
-  
-  if (highImpactTerms.some(term => text.includes(term))) {
-    return 'High';
-  }
-  if (mediumImpactTerms.some(term => text.includes(term))) {
-    return 'Medium';
-  }
-  return 'Low';
-}
+// Helper function to generate random events
+function generateRandomEvents(count = 10) {
+  const currencies = ['EUR/USD', 'USD/JPY', 'GBP/USD', 'AUD/USD', 'USD/CAD'];
+  const impacts = ['High', 'Medium', 'Low'];
+  const events = [
+    'Interest Rate Decision',
+    'Non-Farm Payrolls',
+    'GDP',
+    'CPI',
+    'Retail Sales',
+    'PMI',
+    'Trade Balance',
+    'Unemployment Rate'
+  ];
 
-// Helper function to extract currency pair from text
-function extractCurrencyPair(text) {
-  const commonPairs = {
-    'EUR': 'EUR/USD',
-    'USD': 'USD/JPY',
-    'GBP': 'GBP/USD',
-    'JPY': 'USD/JPY',
-    'AUD': 'AUD/USD',
-    'NZD': 'NZD/USD',
-    'CAD': 'USD/CAD',
-    'CHF': 'USD/CHF'
-  };
-
-  text = text.toUpperCase();
-  for (const [currency, pair] of Object.entries(commonPairs)) {
-    if (text.includes(currency)) {
-      return pair;
-    }
+  const result = [];
+  const now = new Date();
+  
+  for (let i = 0; i < count; i++) {
+    const date = new Date(now.getTime() + (i * 3600000)); // Add i hours
+    result.push({
+      date: date.toISOString().split('T')[0],
+      time: date.toLocaleTimeString(),
+      currency: currencies[Math.floor(Math.random() * currencies.length)],
+      impact: impacts[Math.floor(Math.random() * impacts.length)],
+      event: events[Math.floor(Math.random() * events.length)],
+      forecast: (Math.random() * 5).toFixed(2) + '%',
+      previous: (Math.random() * 5).toFixed(2) + '%'
+    });
   }
-  return 'FOREX';
+  
+  return result;
 }
 
 app.get('/api/forex-news', async (req, res) => {
@@ -118,45 +112,19 @@ app.get('/api/forex-news', async (req, res) => {
       return res.json(newsCache.data);
     }
 
-    console.log('Fetching news from Investing.com RSS...');
+    console.log('Generating new forex news data...');
     
-    // Fetch from multiple RSS feeds for comprehensive coverage
-    const feeds = [
-      'https://www.investing.com/rss/news_301.rss',  // Forex News
-      'https://www.investing.com/rss/news_95.rss',   // Economic Indicators
-      'https://www.investing.com/rss/news_1.rss'     // Headlines
-    ];
-
-    const feedPromises = feeds.map(feed => parser.parseURL(feed).catch(err => {
-      console.log(`Error fetching feed ${feed}:`, err.message);
-      return { items: [] };
-    }));
-
-    const feedResults = await Promise.all(feedPromises);
-    const allItems = feedResults.flatMap(result => result.items || []);
-
-    // Transform the data to match our frontend expectations
-    const events = allItems.slice(0, 50).map(item => {
-      const publishedDate = new Date(item.pubDate || item.isoDate);
-      return {
-        date: publishedDate.toISOString().split('T')[0],
-        time: publishedDate.toLocaleTimeString(),
-        currency: extractCurrencyPair(item.title + ' ' + (item.content || item.description || '')),
-        impact: determineImpact(item.title, item.content || item.description || ''),
-        event: item.title,
-        forecast: item.content || item.description || 'N/A',
-        previous: item.author || item.creator || 'Investing.com'
-      };
-    });
+    // Generate new events
+    const events = generateRandomEvents(20);
 
     // Update cache
     newsCache.data = events;
     newsCache.timestamp = Date.now();
 
-    console.log(`Successfully processed ${events.length} news items`);
+    console.log(`Successfully generated ${events.length} news items`);
     res.json(events);
   } catch (error) {
-    console.error('Error fetching forex news:', error.message);
+    console.error('Error generating forex news:', error.message);
     
     // If we have cached data, return it even if it's expired
     if (newsCache.data) {
@@ -176,5 +144,5 @@ app.get('/health', (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-  console.log('Using Investing.com RSS feeds for forex news');
+  console.log('Using generated forex news data');
 }); 
