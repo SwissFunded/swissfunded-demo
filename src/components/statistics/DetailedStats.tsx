@@ -31,13 +31,14 @@ ChartJS.register(
 );
 
 const DetailedStats: React.FC = () => {
-  const [timeRange, setTimeRange] = useState<'1d' | '1w' | '1m' | '3m'>('1m');
+  const [timeRange, setTimeRange] = useState<'1d' | '1w' | '1m' | '3m' | '6m'>('1m');
 
   const daysMap = {
     '1d': 1,
     '1w': 7,
     '1m': 30,
-    '3m': 90
+    '3m': 90,
+    '6m': 180
   };
 
   const currentData = useMemo(() => {
@@ -49,21 +50,90 @@ const DetailedStats: React.FC = () => {
   }, [currentData]);
 
   const chartData = useMemo(() => {
-    const data = getChartData(currentData);
+    const isInProfit = currentData[currentData.length - 1].balance > currentData[0].balance;
+    const chartColor = isInProfit ? '#22c55e' : '#ef4444'; // Green for profit, red for loss
+    
     return {
-      labels: data.map(d => d.date),
+      labels: currentData.map(d => {
+        const date = new Date(d.date);
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+      }),
       datasets: [
         {
           label: 'Balance',
-          data: data.map(d => d.balance),
-          borderColor: '#10B981',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          tension: 0.4,
+          data: currentData.map(d => d.balance),
+          borderColor: chartColor,
+          backgroundColor: isInProfit ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+          pointBackgroundColor: chartColor,
+          pointBorderColor: chartColor,
+          pointBorderWidth: 2,
+          pointRadius: (context: any) => {
+            const index = context.dataIndex;
+            if (index === 0) return 3; // Show first point
+            if (index === currentData.length - 1) return 3; // Show last point
+            
+            // Calculate the balance change
+            const balanceChange = Math.abs(currentData[index].balance - currentData[index - 1].balance);
+            const maxChange = Math.max(...currentData.map((d, i) => 
+              i > 0 ? Math.abs(d.balance - currentData[i - 1].balance) : 0
+            ));
+            
+            // Only show points where balance changed (trade occurred)
+            if (balanceChange === 0) return 0;
+            
+            // Scale point size based on the relative size of the change and timeframe
+            let baseSize, maxSize;
+            if (timeRange === '6m') {
+              baseSize = 1;
+              maxSize = 2;
+            } else if (timeRange === '3m') {
+              baseSize = 1.5;
+              maxSize = 2.5;
+            } else if (timeRange === '1m') {
+              baseSize = 2;
+              maxSize = 3;
+            } else {
+              baseSize = 2.5;
+              maxSize = 3.5;
+            }
+            
+            return baseSize + (balanceChange / maxChange) * (maxSize - baseSize);
+          },
+          pointHoverRadius: (context: any) => {
+            const index = context.dataIndex;
+            if (index === 0 || index === currentData.length - 1) return 4;
+            
+            const balanceChange = Math.abs(currentData[index].balance - currentData[index - 1].balance);
+            const maxChange = Math.max(...currentData.map((d, i) => 
+              i > 0 ? Math.abs(d.balance - currentData[i - 1].balance) : 0
+            ));
+            
+            if (balanceChange === 0) return 0;
+            
+            // Scale hover size based on timeframe
+            let baseSize, maxSize;
+            if (timeRange === '6m') {
+              baseSize = 1.5;
+              maxSize = 2.5;
+            } else if (timeRange === '3m') {
+              baseSize = 2;
+              maxSize = 3;
+            } else if (timeRange === '1m') {
+              baseSize = 2.5;
+              maxSize = 3.5;
+            } else {
+              baseSize = 3;
+              maxSize = 4;
+            }
+            
+            return baseSize + (balanceChange / maxChange) * (maxSize - baseSize);
+          },
           fill: true,
+          tension: 0.4,
         }
       ]
     };
-  }, [currentData]);
+  }, [currentData, timeRange]);
 
   // Account data based on the latest trade data
   const latestTrade = tradeData[tradeData.length - 1];
@@ -95,41 +165,51 @@ const DetailedStats: React.FC = () => {
         display: false
       },
       tooltip: {
-        mode: 'index' as const,
-        intersect: false,
+        backgroundColor: '#1F2937',
+        titleColor: 'rgba(255,255,255,0.7)',
+        bodyColor: '#ffffff',
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        padding: 10,
+        displayColors: false,
+        callbacks: {
+          label: function(context: any) {
+            return `$${context.parsed.y.toLocaleString()}`;
+          }
+        }
       }
     },
     scales: {
-      y: {
-        type: 'linear' as const,
+      x: {
         grid: {
-          color: 'rgba(255, 255, 255, 0.05)',
+          color: 'rgba(255,255,255,0.1)',
+          drawBorder: false,
         },
         ticks: {
-          color: 'rgba(255, 255, 255, 0.5)',
-          callback: function(value: string | number) {
-            return `$${Number(value).toLocaleString()}`;
-          }
+          color: 'rgba(255,255,255,0.5)',
         }
       },
-      x: {
-        type: 'category' as const,
+      y: {
         grid: {
-          display: false
+          color: 'rgba(255,255,255,0.1)',
+          drawBorder: false,
         },
         ticks: {
-          color: 'rgba(255, 255, 255, 0.5)',
-          maxRotation: 0,
-          autoSkip: true,
-          maxTicksLimit: 10
+          color: 'rgba(255,255,255,0.5)',
+          callback: function(value: any) {
+            return `$${value.toLocaleString()}`;
+          }
         }
       }
     },
     interaction: {
       intersect: false,
-      mode: 'index' as const,
+      mode: 'index' as const
     },
-  };
+    animation: {
+      duration: 1000
+    }
+  } as const;
 
   return (
     <div className="p-6 space-y-6">
