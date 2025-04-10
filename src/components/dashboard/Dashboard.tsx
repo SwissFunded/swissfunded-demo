@@ -62,12 +62,34 @@ const Dashboard: React.FC = () => {
           pointBorderWidth: 2,
           pointRadius: (context: any) => {
             const index = context.dataIndex;
-            if (index === 0) return 4; // Show first point
-            if (index === currentData.length - 1) return 4; // Show last point
-            // Show point only if balance changed (trade occurred)
-            return currentData[index].balance !== currentData[index - 1].balance ? 4 : 0;
+            if (index === 0) return 6; // Show first point
+            if (index === currentData.length - 1) return 6; // Show last point
+            
+            // Calculate the balance change
+            const balanceChange = Math.abs(currentData[index].balance - currentData[index - 1].balance);
+            const maxChange = Math.max(...currentData.map((d, i) => 
+              i > 0 ? Math.abs(d.balance - currentData[i - 1].balance) : 0
+            ));
+            
+            // Only show points where balance changed (trade occurred)
+            if (balanceChange === 0) return 0;
+            
+            // Scale point size based on the relative size of the change
+            // Minimum size of 3, maximum of 6
+            return 3 + (balanceChange / maxChange) * 3;
           },
-          pointHoverRadius: 6,
+          pointHoverRadius: (context: any) => {
+            const index = context.dataIndex;
+            if (index === 0 || index === currentData.length - 1) return 8;
+            
+            const balanceChange = Math.abs(currentData[index].balance - currentData[index - 1].balance);
+            const maxChange = Math.max(...currentData.map((d, i) => 
+              i > 0 ? Math.abs(d.balance - currentData[i - 1].balance) : 0
+            ));
+            
+            if (balanceChange === 0) return 0;
+            return 4 + (balanceChange / maxChange) * 4;
+          },
           fill: true,
           tension: 0.4,
         }
