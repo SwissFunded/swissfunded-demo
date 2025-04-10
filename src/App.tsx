@@ -1,22 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Sidebar from './components/sidebar/Sidebar';
 import Dashboard from './components/dashboard/Dashboard';
 import DetailedStats from './components/statistics/DetailedStats';
 import Tutorials from './components/tutorials/Tutorials';
 import Logo from './components/Logo';
-
-const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <motion.div
-    initial={{ opacity: 0, x: 20 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -20 }}
-    transition={{ duration: 0.3 }}
-  >
-    {children}
-  </motion.div>
-);
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -32,21 +21,19 @@ const AppContent: React.FC = () => {
       <div className="relative flex">
         <Sidebar />
         <div className="flex-1 ml-64 mt-[72px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Routes location={location}>
-                <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
-                <Route path="/statistics" element={<PageTransition><DetailedStats /></PageTransition>} />
-                <Route path="/tutorials" element={<PageTransition><Tutorials /></PageTransition>} />
-              </Routes>
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Routes location={location}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/statistics" element={<DetailedStats />} />
+              <Route path="/tutorials" element={<Tutorials />} />
+            </Routes>
+          </motion.div>
         </div>
       </div>
     </div>
