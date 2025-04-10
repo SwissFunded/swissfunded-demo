@@ -8,7 +8,25 @@ const port = process.env.PORT || 3001;
 // Finnhub API key
 const FINNHUB_API_KEY = 'cvs1dahr01qp7viu6ff0cvs1dahr01qp7viu6ffg';
 
-app.use(cors());
+// Configure CORS with specific options
+app.use(cors({
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}));
+
+// Add specific headers for Safari
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
 app.use(express.json());
 
 // Mock data for fallback
@@ -51,7 +69,8 @@ app.get('/api/forex-news', async (req, res) => {
         token: FINNHUB_API_KEY
       },
       headers: {
-        'X-Finnhub-Token': FINNHUB_API_KEY
+        'X-Finnhub-Token': FINNHUB_API_KEY,
+        'Accept': 'application/json'
       }
     });
 
