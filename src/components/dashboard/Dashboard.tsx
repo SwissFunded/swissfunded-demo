@@ -1,32 +1,33 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
 import ChallengeCard from '../challenge/ChallengeCard';
 import { tradeData } from '../../data/tradeData';
 import { getTimeRangeData, calculateStats, getChartData } from '../../utils/tradeDataUtils';
 
-const CustomDot = (props: any) => {
-  if (!props.cx || !props.cy) return null;
-  
-  const { cx, cy, index, payload, data } = props;
-  const isLastDot = index === data.length - 1;
-
-  return (
-    <circle 
-      cx={cx} 
-      cy={cy} 
-      r={isLastDot ? 6 : 4} 
-      stroke="#ef4444"
-      strokeWidth={2} 
-      fill={isLastDot ? "#ef4444" : "#ffffff"}
-      fillOpacity={isLastDot ? 1 : 0.2}
-      className={isLastDot ? "animate-pulse" : ""}
-    />
-  );
-};
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const Dashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState<'1d' | '1w' | '1m' | '3m'>('1m');
-  const [mounted, setMounted] = useState(false);
 
   const daysMap = {
     '1d': 1,
@@ -44,15 +45,82 @@ const Dashboard: React.FC = () => {
   }, [currentData]);
 
   const chartData = useMemo(() => {
-    return currentData.map(d => ({
-      date: d.date,
-      balance: d.balance
-    }));
+    return {
+      labels: currentData.map(d => {
+        const date = new Date(d.date);
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+      }),
+      datasets: [
+        {
+          label: 'Balance',
+          data: currentData.map(d => d.balance),
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          pointBackgroundColor: '#ffffff',
+          pointBorderColor: '#ef4444',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: true,
+          tension: 0.4,
+        }
+      ]
+    };
   }, [currentData]);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        backgroundColor: '#1F2937',
+        titleColor: 'rgba(255,255,255,0.7)',
+        bodyColor: '#ffffff',
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        padding: 10,
+        displayColors: false,
+        callbacks: {
+          label: function(context: any) {
+            return `$${context.parsed.y.toLocaleString()}`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          color: 'rgba(255,255,255,0.1)',
+          drawBorder: false,
+        },
+        ticks: {
+          color: 'rgba(255,255,255,0.5)',
+        }
+      },
+      y: {
+        grid: {
+          color: 'rgba(255,255,255,0.1)',
+          drawBorder: false,
+        },
+        ticks: {
+          color: 'rgba(255,255,255,0.5)',
+          callback: function(value: any) {
+            return `$${value.toLocaleString()}`;
+          }
+        }
+      }
+    },
+    interaction: {
+      intersect: false,
+      mode: 'index' as const
+    },
+    animation: {
+      duration: 1000
+    }
+  } as const;
 
   return (
     <div className="p-6 space-y-6">
@@ -113,55 +181,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
         <div className="h-[400px] w-full">
-          {mounted && (
-            <LineChart 
-              width={800} 
-              height={400} 
-              data={chartData} 
-              margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
-            >
-              <defs>
-                <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis 
-                dataKey="date" 
-                stroke="rgba(255,255,255,0.5)"
-                tickFormatter={(value) => {
-                  const date = new Date(value);
-                  return `${date.getMonth() + 1}/${date.getDate()}`;
-                }}
-              />
-              <YAxis 
-                stroke="rgba(255,255,255,0.5)"
-                tickFormatter={(value) => `$${value.toLocaleString()}`}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#1F2937',
-                  border: 'none',
-                  borderRadius: '0.5rem',
-                  padding: '1rem'
-                }}
-                labelStyle={{ color: 'rgba(255,255,255,0.7)' }}
-                formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Balance']}
-              />
-              <Line
-                type="monotone"
-                dataKey="balance"
-                stroke="#ef4444"
-                strokeWidth={2}
-                dot={<CustomDot />}
-                activeDot={{ r: 8, fill: '#ef4444' }}
-                isAnimationActive={true}
-                animationDuration={1000}
-                fill="url(#colorBalance)"
-              />
-            </LineChart>
-          )}
+          <Line data={chartData} options={chartOptions} />
         </div>
       </div>
     </div>
