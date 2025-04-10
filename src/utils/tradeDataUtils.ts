@@ -1,8 +1,11 @@
 import { TradeDataPoint } from '../data/tradeData';
 
 export const getTimeRangeData = (data: TradeDataPoint[], days: number) => {
-  const now = new Date();
-  const startDate = new Date(now);
+  if (!data.length) return [];
+  
+  // Find the most recent date in the dataset
+  const mostRecentDate = new Date(data[data.length - 1].date);
+  const startDate = new Date(mostRecentDate);
   startDate.setDate(startDate.getDate() - days);
   startDate.setHours(0, 0, 0, 0);
 
