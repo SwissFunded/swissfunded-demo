@@ -11,35 +11,63 @@ interface NewsEvent {
   previous: string;
 }
 
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://swissfunded-demo-server.vercel.app/api/forex-news'
-  : 'http://localhost:3001/api/forex-news';
+// Use environment variable for API URL
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/forex-news';
+
+// Cache duration in milliseconds (5 minutes)
+const CACHE_DURATION = 5 * 60 * 1000;
 
 const Calendar: React.FC = () => {
   const [events, setEvents] = useState<NewsEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 3;
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
+        // Check cache first
+        const cachedData = localStorage.getItem('forexNewsCache');
+        const cacheTimestamp = localStorage.getItem('forexNewsCacheTimestamp');
+        
+        if (cachedData && cacheTimestamp) {
+          const timestamp = parseInt(cacheTimestamp);
+          if (Date.now() - timestamp < CACHE_DURATION) {
+            setEvents(JSON.parse(cachedData));
+            setLoading(false);
+            return;
+          }
+        }
+
         const response = await fetch(API_URL);
         if (!response.ok) {
-          throw new Error('Failed to fetch news events');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        
+        // Cache the data
+        localStorage.setItem('forexNewsCache', JSON.stringify(data));
+        localStorage.setItem('forexNewsCacheTimestamp', Date.now().toString());
+        
         setEvents(data);
         setError(null);
+        setRetryCount(0);
       } catch (err) {
         console.error('Error fetching news:', err);
-        setError('Failed to fetch news events. Please try again later.');
+        if (retryCount < maxRetries) {
+          setRetryCount(prev => prev + 1);
+          setTimeout(() => fetchNews(), 2000 * (retryCount + 1)); // Exponential backoff
+        } else {
+          setError('Failed to fetch news events. Please try again later.');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchNews();
-  }, []);
+  }, [retryCount]);
 
   const getImpactColor = (impact: string) => {
     switch (impact.toLowerCase()) {
@@ -64,8 +92,16 @@ const Calendar: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <div className="text-red-500">{error}</div>
+        {retryCount < maxRetries && (
+          <button
+            onClick={() => setRetryCount(prev => prev + 1)}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Retry
+          </button>
+        )}
       </div>
     );
   }
@@ -79,7 +115,7 @@ const Calendar: React.FC = () => {
     >
       <h1 className="text-2xl font-bold mb-6">Forex News Calendar</h1>
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-lg overflow-hidden">
+        <table className="min-w-full bg-white rounded-lg overflow-hidden shadow-sm">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
