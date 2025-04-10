@@ -10,33 +10,43 @@ const ALPHA_VANTAGE_API_KEY = '8HPA8P1L9XGJLTPE';
 
 // Configure CORS with specific options for Safari
 const corsOptions = {
-  origin: '*',
+  origin: function (origin, callback) {
+    const allowedOrigins = ['http://localhost:3000', 'https://swissfunded-demo.vercel.app'];
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   preflightContinue: false,
-  optionsSuccessStatus: 204,
-  maxAge: 86400 // 24 hours
+  optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
 
-// Add specific headers for Safari
+// Add security headers for Safari
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Max-Age', '86400');
-  res.header('Vary', 'Origin');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
+  const origin = req.headers.origin;
+  if (origin && ['http://localhost:3000', 'https://swissfunded-demo.vercel.app'].includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
   }
-  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   next();
 });
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
@@ -106,23 +116,21 @@ function parseAlphaVantageTime(timeStr) {
 
 app.get('/api/forex-news', async (req, res) => {
   try {
-    // Check cache first
-    if (newsCache.data && newsCache.timestamp && 
-        (Date.now() - newsCache.timestamp) < newsCache.expiry) {
-      console.log('Returning cached news data');
-      return res.json(newsCache.data);
-    }
-
-    console.log('Fetching news from Alpha Vantage...');
+    console.log('Using Alpha Vantage API');
     const response = await axios.get('https://www.alphavantage.co/query', {
       params: {
         function: 'NEWS_SENTIMENT',
         topics: 'forex',
-        apikey: ALPHA_VANTAGE_API_KEY
+        apikey: '8HPA8P1L9XGJLTPE',
+        sort: 'LATEST',
+        limit: 50
       },
       headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
         'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15'
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
       }
     });
 
