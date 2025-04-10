@@ -47,7 +47,8 @@ const Dashboard: React.FC = () => {
 
   const chartData = useMemo(() => {
     const isInProfit = currentData[currentData.length - 1].balance > currentData[0].balance;
-    const chartColor = isInProfit ? '#22c55e' : '#ef4444'; // Green for profit, red for loss
+    const isNoChange = currentData[currentData.length - 1].balance === currentData[0].balance;
+    const chartColor = isNoChange ? '#ffffff' : (isInProfit ? '#22c55e' : '#ef4444'); // White for no change, green for profit, red for loss
     
     return {
       labels: currentData.map(d => {
@@ -59,7 +60,7 @@ const Dashboard: React.FC = () => {
           label: 'Balance',
           data: currentData.map(d => d.balance),
           borderColor: chartColor,
-          backgroundColor: isInProfit ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+          backgroundColor: isNoChange ? 'rgba(255, 255, 255, 0.1)' : (isInProfit ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
           pointBackgroundColor: chartColor,
           pointBorderColor: chartColor,
           pointBorderWidth: 2,
