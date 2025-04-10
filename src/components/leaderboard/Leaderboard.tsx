@@ -68,6 +68,17 @@ const successfulTraders = [
     favoritePairs: ['USD/JPY', 'EUR/CHF'],
     image: 'https://randomuser.me/api/portraits/men/22.jpg',
     rank: 6
+  },
+  {
+    id: 7,
+    name: 'Olivia Chen',
+    profit: 78000,
+    winRate: 74.8,
+    profitFactor: 2.5,
+    strategy: 'Range Trading',
+    favoritePairs: ['AUD/JPY', 'NZD/JPY'],
+    image: 'https://randomuser.me/api/portraits/women/44.jpg',
+    rank: 7
   }
 ];
 
