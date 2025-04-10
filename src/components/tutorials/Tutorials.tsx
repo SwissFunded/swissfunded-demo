@@ -1,49 +1,6 @@
 import React from 'react';
-import { PlayIcon, ArrowUpIcon } from '@heroicons/react/24/solid';
+import { PlayIcon } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
-
-const successfulTraders = [
-  {
-    id: 1,
-    name: 'Alex Thompson',
-    profit: 125000,
-    winRate: 82.5,
-    profitFactor: 3.2,
-    strategy: 'Price Action',
-    favoritePairs: ['EUR/USD', 'GBP/USD'],
-    image: 'https://randomuser.me/api/portraits/men/32.jpg'
-  },
-  {
-    id: 2,
-    name: 'Sarah Chen',
-    profit: 98000,
-    winRate: 78.3,
-    profitFactor: 2.8,
-    strategy: 'Swing Trading',
-    favoritePairs: ['USD/JPY', 'AUD/USD'],
-    image: 'https://randomuser.me/api/portraits/women/44.jpg'
-  },
-  {
-    id: 3,
-    name: 'Michael Rodriguez',
-    profit: 156000,
-    winRate: 75.6,
-    profitFactor: 3.5,
-    strategy: 'Breakout Trading',
-    favoritePairs: ['GBP/JPY', 'EUR/GBP'],
-    image: 'https://randomuser.me/api/portraits/men/67.jpg'
-  },
-  {
-    id: 4,
-    name: 'Emma Wilson',
-    profit: 112000,
-    winRate: 80.2,
-    profitFactor: 3.0,
-    strategy: 'Trend Following',
-    favoritePairs: ['USD/CAD', 'NZD/USD'],
-    image: 'https://randomuser.me/api/portraits/women/68.jpg'
-  }
-];
 
 const tutorials = [
   {
@@ -76,72 +33,72 @@ const tutorials = [
   },
   {
     id: 5,
-    title: 'Position Sizing Calculator',
-    description: 'How to use the position sizing calculator effectively',
-    duration: '3:50',
+    title: 'Risk Management Fundamentals',
+    description: 'Essential risk management techniques for traders',
+    duration: '7:15',
     category: 'Risk Management',
   },
   {
     id: 6,
-    title: 'Chart Analysis Tools',
-    description: 'Mastering the charting tools in TradeLocker',
-    duration: '7:20',
+    title: 'Technical Analysis Basics',
+    description: 'Introduction to technical analysis and chart patterns',
+    duration: '9:20',
     category: 'Technical Analysis',
   },
   {
     id: 7,
-    title: 'Setting Up Alerts',
-    description: 'How to set up price and indicator alerts',
-    duration: '4:10',
-    category: 'Tools',
+    title: 'Fundamental Analysis',
+    description: 'Understanding market fundamentals and news trading',
+    duration: '8:45',
+    category: 'Fundamental Analysis',
   },
   {
     id: 8,
-    title: 'Using Market Orders',
-    description: 'When and how to use market orders effectively',
-    duration: '5:15',
-    category: 'Order Types',
+    title: 'Trading Psychology',
+    description: 'Managing emotions and maintaining discipline',
+    duration: '6:30',
+    category: 'Psychology',
   },
   {
     id: 9,
-    title: 'Limit Orders Explained',
-    description: 'Understanding and using limit orders',
-    duration: '4:45',
-    category: 'Order Types',
+    title: 'Position Sizing',
+    description: 'How to calculate proper position sizes',
+    duration: '5:45',
+    category: 'Risk Management',
   },
   {
     id: 10,
-    title: 'Trailing Stop Loss',
-    description: 'How to set up and use trailing stop losses',
-    duration: '5:30',
-    category: 'Risk Management',
-  },
-  {
-    id: 11,
-    title: 'Trade Journal Setup',
-    description: 'Setting up and maintaining a trade journal',
-    duration: '6:15',
-    category: 'Tools',
-  },
-  {
-    id: 12,
-    title: 'Risk Management Basics',
-    description: 'Fundamental principles of risk management',
-    duration: '7:45',
-    category: 'Risk Management',
-  },
-  {
-    id: 13,
-    title: 'Technical Indicators',
-    description: 'How to add and use technical indicators',
-    duration: '8:20',
+    title: 'Candlestick Patterns',
+    description: 'Understanding and trading candlestick patterns',
+    duration: '7:50',
     category: 'Technical Analysis',
   },
   {
+    id: 11,
+    title: 'Moving Averages',
+    description: 'Using moving averages in your trading strategy',
+    duration: '6:15',
+    category: 'Technical Analysis',
+  },
+  {
+    id: 12,
+    title: 'Support and Resistance',
+    description: 'Identifying and trading support and resistance levels',
+    duration: '7:25',
+    category: 'Technical Analysis',
+  },
+  {
+    id: 13,
+    title: 'Trading Journal',
+    description: 'How to maintain an effective trading journal',
+    duration: '5:10',
+    category: 'Risk Management',
+  },
+  {
     id: 14,
-    title: 'Multiple Timeframe Analysis',
-    description: 'Using multiple timeframes for better analysis',
-    duration: '6:50',
+    title: 'Fibonacci Trading',
+    description: 'Using Fibonacci levels in your trading',
+    duration: '8:15',
     category: 'Technical Analysis',
   },
   {
@@ -181,61 +138,16 @@ const tutorials = [
   },
   {
     id: 20,
-    title: 'Performance Analytics',
-    description: 'Using TradeLocker\'s performance analytics tools',
-    duration: '6:40',
-    category: 'Tools',
-  },
+    title: 'Market Analysis Tools',
+    description: 'Using market analysis tools effectively',
+    duration: '6:45',
+    category: 'Technical Analysis',
+  }
 ];
 
 const Tutorials: React.FC = () => {
   return (
     <div className="p-8 space-y-8">
-      {/* Successful Traders Section */}
-      <div>
-        <h2 className="text-2xl font-heading tracking-tight mb-6">Successful Traders</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {successfulTraders.map((trader) => (
-            <motion.div
-              key={trader.id}
-              whileHover={{ scale: 1.02 }}
-              className="bg-background-light rounded-xl p-6"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <img
-                  src={trader.image}
-                  alt={trader.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <h3 className="text-lg font-medium">{trader.name}</h3>
-                  <p className="text-sm text-text-muted">{trader.strategy}</p>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-text-muted">Total Profit</span>
-                  <span className="text-green-500 font-medium">${trader.profit.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-text-muted">Win Rate</span>
-                  <span className="text-green-500 font-medium">{trader.winRate}%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-text-muted">Profit Factor</span>
-                  <span className="text-green-500 font-medium">{trader.profitFactor}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-text-muted">Favorite Pairs</span>
-                  <span className="text-text-muted">{trader.favoritePairs.join(', ')}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* Tutorials Section */}
       <div>
         <h2 className="text-2xl font-heading tracking-tight mb-6">Trading Tutorials</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
