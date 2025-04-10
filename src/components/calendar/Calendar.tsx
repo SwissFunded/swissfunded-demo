@@ -106,13 +106,13 @@ const Calendar: React.FC = () => {
   const getImpactColor = (impact: string) => {
     switch (impact.toLowerCase()) {
       case 'high':
-        return 'bg-red-100 text-red-800';
+        return 'bg-[#e74c3c]/10 text-[#e74c3c]';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-500/10 text-yellow-500';
       case 'low':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-500/10 text-green-500';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-500/10 text-gray-500';
     }
   };
 
@@ -135,7 +135,7 @@ const Calendar: React.FC = () => {
         animate={{ opacity: 1 }}
         className="flex flex-col items-center justify-center h-64 space-y-4"
       >
-        <p className="text-red-600">{error}</p>
+        <p className="text-[#e74c3c]">{error}</p>
         {retryCount < maxRetries && (
           <button
             onClick={() => setRetryCount(prev => prev + 1)}
@@ -155,13 +155,13 @@ const Calendar: React.FC = () => {
       className="space-y-6"
     >
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-white rounded-lg shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Currency Pair</label>
+          <label className="block text-sm font-medium text-[#cccccc] mb-2">Currency Pair</label>
           <select
             value={selectedCurrency}
             onChange={(e) => setSelectedCurrency(e.target.value)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-3 py-2 focus:border-primary focus:ring-primary"
           >
             <option value="all">All Pairs</option>
             {uniqueCurrencies.map(currency => (
@@ -171,11 +171,11 @@ const Calendar: React.FC = () => {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Impact</label>
+          <label className="block text-sm font-medium text-[#cccccc] mb-2">Impact</label>
           <select
             value={selectedImpact}
             onChange={(e) => setSelectedImpact(e.target.value)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-3 py-2 focus:border-primary focus:ring-primary"
           >
             <option value="all">All Impacts</option>
             {uniqueImpacts.map(impact => (
@@ -185,11 +185,11 @@ const Calendar: React.FC = () => {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Event</label>
+          <label className="block text-sm font-medium text-[#cccccc] mb-2">Event</label>
           <select
             value={selectedEvent}
             onChange={(e) => setSelectedEvent(e.target.value)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-3 py-2 focus:border-primary focus:ring-primary"
           >
             <option value="all">All Events</option>
             {uniqueEvents.map(event => (
@@ -199,58 +199,58 @@ const Calendar: React.FC = () => {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+          <label className="block text-sm font-medium text-[#cccccc] mb-2">Date Range</label>
           <div className="flex space-x-2">
             <input
               type="date"
               value={dateRange.start}
               onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+              className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-3 py-2 focus:border-primary focus:ring-primary"
             />
             <input
               type="date"
               value={dateRange.end}
               onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+              className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-3 py-2 focus:border-primary focus:ring-primary"
             />
           </div>
         </div>
       </div>
 
       {/* Calendar Table */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="overflow-x-auto bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
+        <table className="min-w-full divide-y divide-[#2a2a2a]">
+          <thead className="bg-[#2a2a2a]">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Impact</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Forecast</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Previous</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Date</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Time</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Currency</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Impact</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Event</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Forecast</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Previous</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-[#1a1a1a] divide-y divide-[#2a2a2a]">
             {filteredEvents.map((event, index) => (
               <motion.tr
                 key={`${event.date}-${event.time}-${index}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="hover:bg-gray-50"
+                className="hover:bg-[#2a2a2a]"
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{event.date}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{event.time}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{event.currency}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.date}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.time}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{event.currency}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getImpactColor(event.impact)}`}>
                     {event.impact}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{event.event}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{event.forecast}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{event.previous}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.event}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.forecast}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.previous}</td>
               </motion.tr>
             ))}
           </tbody>
