@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import ChallengeCard from '../challenge/ChallengeCard';
 import { tradeData } from '../../data/tradeData';
 import { getTimeRangeData, calculateStats, getChartData } from '../../utils/tradeDataUtils';
 
 const CustomDot = (props: any) => {
+  if (!props.cx || !props.cy) return null;
+  
   const { cx, cy, index, payload, data } = props;
   const isLastDot = index === data.length - 1;
 
@@ -24,6 +26,7 @@ const CustomDot = (props: any) => {
 
 const Dashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState<'1d' | '1w' | '1m' | '3m'>('1m');
+  const [isLoading, setIsLoading] = useState(true);
 
   const daysMap = {
     '1d': 1,
@@ -34,7 +37,7 @@ const Dashboard: React.FC = () => {
 
   const currentData = useMemo(() => {
     return getTimeRangeData(tradeData, daysMap[timeRange]);
-  }, [timeRange]);
+  }, [timeRange, daysMap]);
 
   const stats = useMemo(() => {
     return calculateStats(currentData);
@@ -46,6 +49,26 @@ const Dashboard: React.FC = () => {
       balance: d.balance
     }));
   }, [currentData]);
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="text-center">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!chartData.length) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="text-center">No data available for the selected time range.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -138,6 +161,8 @@ const Dashboard: React.FC = () => {
                 strokeWidth={2}
                 dot={<CustomDot />}
                 activeDot={{ r: 8, fill: '#ef4444' }}
+                isAnimationActive={true}
+                animationDuration={1000}
               />
             </LineChart>
           </ResponsiveContainer>
