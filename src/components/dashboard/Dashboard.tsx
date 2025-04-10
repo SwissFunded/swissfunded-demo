@@ -15,7 +15,8 @@ const CustomDot = (props: any) => {
       r={isLastDot ? 6 : 4} 
       stroke="#ef4444"
       strokeWidth={2} 
-      fill={isLastDot ? "#ef4444" : "#1F2937"}
+      fill={isLastDot ? "#ef4444" : "#ffffff"}
+      fillOpacity={isLastDot ? 1 : 0.2}
       className={isLastDot ? "animate-pulse" : ""}
     />
   );
