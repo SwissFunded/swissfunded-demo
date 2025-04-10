@@ -1,12 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/demo",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/demo/:path*",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+  "framework": "create-react-app"
 } 
