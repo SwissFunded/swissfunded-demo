@@ -1,16 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const Parser = require('rss-parser');
 
 const app = express();
 const port = process.env.PORT || 3001;
-
-// NewsAPI key - you'll need to replace this with your own key from newsapi.org
-const NEWS_API_KEY = '4169ea525c8b4b8887251c67b12e55e7';
+const parser = new Parser();
 
 // Configure CORS
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://swissfunded-demo.vercel.app'],
+  origin: ['https://swissfunded-demo.vercel.app', 'http://localhost:3000'],
   methods: ['GET', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -23,7 +22,7 @@ app.use(cors(corsOptions));
 // Add security headers
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin && ['http://localhost:3000', 'https://swissfunded-demo.vercel.app'].includes(origin)) {
+  if (origin && ['https://swissfunded-demo.vercel.app', 'http://localhost:3000'].includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -38,7 +37,7 @@ app.use(express.json());
 let newsCache = {
   data: null,
   timestamp: null,
-  expiry: 10 * 60 * 1000 // 10 minutes
+  expiry: 5 * 60 * 1000 // 5 minutes
 };
 
 // Mock data for fallback
@@ -119,33 +118,34 @@ app.get('/api/forex-news', async (req, res) => {
       return res.json(newsCache.data);
     }
 
-    console.log('Fetching news from NewsAPI...');
-    const response = await axios.get('https://newsapi.org/v2/everything', {
-      params: {
-        q: '(forex OR "foreign exchange" OR currency) AND (trading OR market)',
-        language: 'en',
-        sortBy: 'publishedAt',
-        pageSize: 50,
-        apiKey: NEWS_API_KEY
-      }
-    });
+    console.log('Fetching news from Investing.com RSS...');
+    
+    // Fetch from multiple RSS feeds for comprehensive coverage
+    const feeds = [
+      'https://www.investing.com/rss/news_301.rss',  // Forex News
+      'https://www.investing.com/rss/news_95.rss',   // Economic Indicators
+      'https://www.investing.com/rss/news_1.rss'     // Headlines
+    ];
 
-    if (!response.data || !response.data.articles || response.data.articles.length === 0) {
-      console.log('No data from NewsAPI, falling back to mock data');
-      return res.json(mockEvents);
-    }
+    const feedPromises = feeds.map(feed => parser.parseURL(feed).catch(err => {
+      console.log(`Error fetching feed ${feed}:`, err.message);
+      return { items: [] };
+    }));
+
+    const feedResults = await Promise.all(feedPromises);
+    const allItems = feedResults.flatMap(result => result.items || []);
 
     // Transform the data to match our frontend expectations
-    const events = response.data.articles.map(article => {
-      const publishedDate = new Date(article.publishedAt);
+    const events = allItems.slice(0, 50).map(item => {
+      const publishedDate = new Date(item.pubDate || item.isoDate);
       return {
         date: publishedDate.toISOString().split('T')[0],
         time: publishedDate.toLocaleTimeString(),
-        currency: extractCurrencyPair(article.title + ' ' + article.description),
-        impact: determineImpact(article.title, article.description),
-        event: article.title,
-        forecast: article.description?.substring(0, 200) + (article.description?.length > 200 ? '...' : '') || 'N/A',
-        previous: article.source.name
+        currency: extractCurrencyPair(item.title + ' ' + (item.content || item.description || '')),
+        impact: determineImpact(item.title, item.content || item.description || ''),
+        event: item.title,
+        forecast: item.content || item.description || 'N/A',
+        previous: item.author || item.creator || 'Investing.com'
       };
     });
 
@@ -157,13 +157,10 @@ app.get('/api/forex-news', async (req, res) => {
     res.json(events);
   } catch (error) {
     console.error('Error fetching forex news:', error.message);
-    if (error.response?.data) {
-      console.error('API Response:', error.response.data);
-    }
     
     // If we have cached data, return it even if it's expired
     if (newsCache.data) {
-      console.log('Returning expired cached data due to API error');
+      console.log('Returning expired cached data due to error');
       return res.json(newsCache.data);
     }
     
@@ -172,7 +169,12 @@ app.get('/api/forex-news', async (req, res) => {
   }
 });
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-  console.log('Using NewsAPI for forex news');
+  console.log('Using Investing.com RSS feeds for forex news');
 }); 

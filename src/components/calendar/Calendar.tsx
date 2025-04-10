@@ -11,6 +11,10 @@ interface NewsEvent {
   previous: string;
 }
 
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://swissfunded-demo-server.vercel.app/api/forex-news'
+  : 'http://localhost:3001/api/forex-news';
+
 const Calendar: React.FC = () => {
   const [events, setEvents] = useState<NewsEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +23,7 @@ const Calendar: React.FC = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/forex-news');
+        const response = await fetch(API_URL);
         if (!response.ok) {
           throw new Error('Failed to fetch news events');
         }
