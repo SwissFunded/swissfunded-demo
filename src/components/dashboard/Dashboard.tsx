@@ -27,13 +27,14 @@ ChartJS.register(
 );
 
 const Dashboard: React.FC = () => {
-  const [timeRange, setTimeRange] = useState<'1d' | '1w' | '1m' | '3m'>('1m');
+  const [timeRange, setTimeRange] = useState<'1d' | '1w' | '1m' | '3m' | '6m'>('1m');
 
   const daysMap = {
     '1d': 1,
     '1w': 7,
     '1m': 30,
-    '3m': 90
+    '3m': 90,
+    '6m': 180
   };
 
   const currentData = useMemo(() => {
@@ -177,6 +178,12 @@ const Dashboard: React.FC = () => {
               className={`px-3 py-1 rounded ${timeRange === '3m' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
             >
               3M
+            </button>
+            <button
+              onClick={() => setTimeRange('6m')}
+              className={`px-3 py-1 rounded ${timeRange === '6m' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
+            >
+              6M
             </button>
           </div>
         </div>
