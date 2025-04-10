@@ -159,172 +159,146 @@ const Calendar: React.FC = () => {
         <h1 className="text-3xl font-bold mb-8">Forex News Calendar</h1>
         
         {/* Filters */}
-        <div className="bg-[#2a2a2a] rounded-lg p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Currency Pairs Filter */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-300">Currency Pairs</label>
-              <div className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Currency Pairs Filter */}
+          <div className="bg-[#2a2a2a] rounded-lg p-4 hover:bg-[#333333] transition-colors cursor-pointer" onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
+            <div className="text-sm text-gray-400 mb-1">Currency Pair</div>
+            <div className="text-xl font-semibold">{selectedCurrency || 'All Pairs'}</div>
+            {showCurrencyDropdown && (
+              <div className="absolute z-10 mt-2 w-48 bg-[#1a1a1a] border border-[#333333] rounded-md shadow-lg">
                 <button
-                  onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-                  className="w-full px-4 py-2 bg-[#1a1a1a] border border-[#333333] rounded-md text-white hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent flex items-center justify-between"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedCurrency(null);
+                    setShowCurrencyDropdown(false);
+                  }}
+                  className={`w-full px-4 py-2 text-left text-sm ${
+                    selectedCurrency === null
+                      ? 'bg-primary text-white'
+                      : 'text-gray-300 hover:bg-[#333333]'
+                  }`}
                 >
-                  <span>{selectedCurrency || 'All Pairs'}</span>
-                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  All Pairs
                 </button>
-                {showCurrencyDropdown && (
-                  <div className="absolute z-10 w-full mt-1 bg-[#1a1a1a] border border-[#333333] rounded-md shadow-lg">
-                    <button
-                      onClick={() => {
-                        setSelectedCurrency(null);
-                        setShowCurrencyDropdown(false);
-                      }}
-                      className={`w-full px-4 py-2 text-left text-sm ${
-                        selectedCurrency === null
-                          ? 'bg-primary text-white'
-                          : 'text-gray-300 hover:bg-[#333333]'
-                      }`}
-                    >
-                      All Pairs
-                    </button>
-                    {uniqueCurrencies.map((currency) => (
-                      <button
-                        key={currency}
-                        onClick={() => {
-                          setSelectedCurrency(currency);
-                          setShowCurrencyDropdown(false);
-                        }}
-                        className={`w-full px-4 py-2 text-left text-sm ${
-                          selectedCurrency === currency
-                            ? 'bg-primary text-white'
-                            : 'text-gray-300 hover:bg-[#333333]'
-                        }`}
-                      >
-                        {currency}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {uniqueCurrencies.map((currency) => (
+                  <button
+                    key={currency}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedCurrency(currency);
+                      setShowCurrencyDropdown(false);
+                    }}
+                    className={`w-full px-4 py-2 text-left text-sm ${
+                      selectedCurrency === currency
+                        ? 'bg-primary text-white'
+                        : 'text-gray-300 hover:bg-[#333333]'
+                    }`}
+                  >
+                    {currency}
+                  </button>
+                ))}
               </div>
-            </div>
+            )}
+          </div>
 
-            {/* Impact Filter */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-300">Impact</label>
-              <div className="relative">
+          {/* Impact Filter */}
+          <div className="bg-[#2a2a2a] rounded-lg p-4 hover:bg-[#333333] transition-colors cursor-pointer" onClick={() => setShowImpactDropdown(!showImpactDropdown)}>
+            <div className="text-sm text-gray-400 mb-1">Impact</div>
+            <div className="text-xl font-semibold">{selectedImpact || 'All Impacts'}</div>
+            {showImpactDropdown && (
+              <div className="absolute z-10 mt-2 w-48 bg-[#1a1a1a] border border-[#333333] rounded-md shadow-lg">
                 <button
-                  onClick={() => setShowImpactDropdown(!showImpactDropdown)}
-                  className="w-full px-4 py-2 bg-[#1a1a1a] border border-[#333333] rounded-md text-white hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent flex items-center justify-between"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedImpact(null);
+                    setShowImpactDropdown(false);
+                  }}
+                  className={`w-full px-4 py-2 text-left text-sm ${
+                    selectedImpact === null
+                      ? 'bg-primary text-white'
+                      : 'text-gray-300 hover:bg-[#333333]'
+                  }`}
                 >
-                  <span>{selectedImpact || 'All Impacts'}</span>
-                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  All Impacts
                 </button>
-                {showImpactDropdown && (
-                  <div className="absolute z-10 w-full mt-1 bg-[#1a1a1a] border border-[#333333] rounded-md shadow-lg">
-                    <button
-                      onClick={() => {
-                        setSelectedImpact(null);
-                        setShowImpactDropdown(false);
-                      }}
-                      className={`w-full px-4 py-2 text-left text-sm ${
-                        selectedImpact === null
-                          ? 'bg-primary text-white'
-                          : 'text-gray-300 hover:bg-[#333333]'
-                      }`}
-                    >
-                      All Impacts
-                    </button>
-                    {uniqueImpacts.map((impact) => (
-                      <button
-                        key={impact}
-                        onClick={() => {
-                          setSelectedImpact(impact);
-                          setShowImpactDropdown(false);
-                        }}
-                        className={`w-full px-4 py-2 text-left text-sm ${
-                          selectedImpact === impact
-                            ? 'bg-primary text-white'
-                            : 'text-gray-300 hover:bg-[#333333]'
-                        }`}
-                      >
-                        {impact}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {uniqueImpacts.map((impact) => (
+                  <button
+                    key={impact}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedImpact(impact);
+                      setShowImpactDropdown(false);
+                    }}
+                    className={`w-full px-4 py-2 text-left text-sm ${
+                      selectedImpact === impact
+                        ? 'bg-primary text-white'
+                        : 'text-gray-300 hover:bg-[#333333]'
+                    }`}
+                  >
+                    {impact}
+                  </button>
+                ))}
               </div>
-            </div>
+            )}
+          </div>
 
-            {/* Event Type Filter */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-300">Event Type</label>
-              <div className="relative">
+          {/* Event Type Filter */}
+          <div className="bg-[#2a2a2a] rounded-lg p-4 hover:bg-[#333333] transition-colors cursor-pointer" onClick={() => setShowEventDropdown(!showEventDropdown)}>
+            <div className="text-sm text-gray-400 mb-1">Event Type</div>
+            <div className="text-xl font-semibold">{selectedEvent || 'All Events'}</div>
+            {showEventDropdown && (
+              <div className="absolute z-10 mt-2 w-48 bg-[#1a1a1a] border border-[#333333] rounded-md shadow-lg">
                 <button
-                  onClick={() => setShowEventDropdown(!showEventDropdown)}
-                  className="w-full px-4 py-2 bg-[#1a1a1a] border border-[#333333] rounded-md text-white hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent flex items-center justify-between"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedEvent(null);
+                    setShowEventDropdown(false);
+                  }}
+                  className={`w-full px-4 py-2 text-left text-sm ${
+                    selectedEvent === null
+                      ? 'bg-primary text-white'
+                      : 'text-gray-300 hover:bg-[#333333]'
+                  }`}
                 >
-                  <span>{selectedEvent || 'All Events'}</span>
-                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  All Events
                 </button>
-                {showEventDropdown && (
-                  <div className="absolute z-10 w-full mt-1 bg-[#1a1a1a] border border-[#333333] rounded-md shadow-lg">
-                    <button
-                      onClick={() => {
-                        setSelectedEvent(null);
-                        setShowEventDropdown(false);
-                      }}
-                      className={`w-full px-4 py-2 text-left text-sm ${
-                        selectedEvent === null
-                          ? 'bg-primary text-white'
-                          : 'text-gray-300 hover:bg-[#333333]'
-                      }`}
-                    >
-                      All Events
-                    </button>
-                    {uniqueEvents.map((event) => (
-                      <button
-                        key={event}
-                        onClick={() => {
-                          setSelectedEvent(event);
-                          setShowEventDropdown(false);
-                        }}
-                        className={`w-full px-4 py-2 text-left text-sm ${
-                          selectedEvent === event
-                            ? 'bg-primary text-white'
-                            : 'text-gray-300 hover:bg-[#333333]'
-                        }`}
-                      >
-                        {event}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {uniqueEvents.map((event) => (
+                  <button
+                    key={event}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedEvent(event);
+                      setShowEventDropdown(false);
+                    }}
+                    className={`w-full px-4 py-2 text-left text-sm ${
+                      selectedEvent === event
+                        ? 'bg-primary text-white'
+                        : 'text-gray-300 hover:bg-[#333333]'
+                    }`}
+                  >
+                    {event}
+                  </button>
+                ))}
               </div>
-            </div>
+            )}
+          </div>
 
-            {/* Date Range Filter */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-300">Date Range</label>
-              <div className="flex gap-2">
-                <input
-                  type="date"
-                  value={dateRange.start}
-                  onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                  className="w-full px-3 py-1.5 rounded-md bg-[#1a1a1a] border border-[#333333] text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-                <input
-                  type="date"
-                  value={dateRange.end}
-                  onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                  className="w-full px-3 py-1.5 rounded-md bg-[#1a1a1a] border border-[#333333] text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
+          {/* Date Range Filter */}
+          <div className="bg-[#2a2a2a] rounded-lg p-4">
+            <div className="text-sm text-gray-400 mb-1">Date Range</div>
+            <div className="flex gap-2">
+              <input
+                type="date"
+                value={dateRange.start}
+                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                className="w-full px-3 py-1.5 rounded-md bg-[#1a1a1a] border border-[#333333] text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+              <input
+                type="date"
+                value={dateRange.end}
+                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                className="w-full px-3 py-1.5 rounded-md bg-[#1a1a1a] border border-[#333333] text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
             </div>
           </div>
         </div>
