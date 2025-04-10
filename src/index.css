@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Inter:wght@400;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-background text-text;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold;
+  }
+
+  * {
+    @apply transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .navbar {
+    @apply fixed top-0 left-0 w-full bg-background/80 backdrop-blur-xl py-4 px-12 flex justify-center items-center z-50;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:text-text transition-all duration-200;
+  }
+  
+  .sidebar-item.active {
+    @apply bg-primary text-text;
+  }
+
+  .card {
+    @apply bg-background-light rounded-2xl p-6 border border-white/[0.02] hover:bg-background-light/95 transition-all duration-300;
+  }
+
+  .badge {
+    @apply px-3 py-1 rounded-full text-sm font-medium transition-all duration-200;
+  }
+
+  .badge-danger {
+    @apply bg-primary/10 text-primary hover:bg-primary/20;
+  }
+
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-text hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/20;
+  }
+
+  .btn-secondary {
+    @apply bg-background-lighter text-text hover:bg-background-light border border-white/[0.02] hover:border-primary/20;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 bg-background-lighter text-text border border-white/[0.02] rounded-lg 
+           focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+  }
+
+  .nav-blur {
+    @apply bg-[#0B0B0D]/80 backdrop-blur-lg;
+  }
+}
+
+@keyframes pulse-dot {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.5));
+  }
+  50% {
+    transform: scale(1.5);
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.5));
+  }
+}
+
+.pulse-dot {
+  transform-box: fill-box;
+  transform-origin: center center;
+  animation: gentlePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Chart customization */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: rgba(255, 255, 255, 0.05);
+}
+
+.recharts-line path {
+  stroke: #ff3b2f !important;
+  filter: drop-shadow(0 0 12px rgba(255, 59, 47, 0.5));
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: rgba(26, 26, 26, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.02) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.75rem !important;
+}
+
+/* Theme transition utilities */
+.theme-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+@keyframes scaleAnimation {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(255, 59, 47, 0.6));
+  }
+  50% {
+    transform: scale(1.5);
+    filter: drop-shadow(0 0 15px rgba(255, 59, 47, 0.8));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(255, 59, 47, 0.6));
+  }
+}
+
+.scale-dot {
+  transform-origin: center;
+  animation: scaleAnimation 2s ease-in-out infinite;
+}
+
+/* Theme transition utilities */
+.theme-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+@keyframes glowingDot {
+  0% {
+    filter: drop-shadow(0 0 4px rgba(255, 59, 47, 0.6));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(255, 59, 47, 0.8));
+    transform: scale(1.2);
+  }
+  100% {
+    filter: drop-shadow(0 0 4px rgba(255, 59, 47, 0.6));
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+}
+
+.glowing-dot {
+  animation: glowingDot 3s ease-in-out infinite;
+}
+
+.pulse-ring {
+  animation: pulseRing 3s ease-out infinite;
+}
+
+.ping-slow {
+  animation: ping 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes gentlePulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(255, 59, 47, 0.6));
+  }
+  50% {
+    transform: scale(1.8);
+    filter: drop-shadow(0 0 15px rgba(255, 59, 47, 0.8));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(255, 59, 47, 0.6));
+  }
+}
