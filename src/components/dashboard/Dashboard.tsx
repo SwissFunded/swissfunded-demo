@@ -62,8 +62,8 @@ const Dashboard: React.FC = () => {
           pointBorderWidth: 2,
           pointRadius: (context: any) => {
             const index = context.dataIndex;
-            if (index === 0) return 4; // Show first point
-            if (index === currentData.length - 1) return 4; // Show last point
+            if (index === 0) return 3; // Show first point
+            if (index === currentData.length - 1) return 3; // Show last point
             
             // Calculate the balance change
             const balanceChange = Math.abs(currentData[index].balance - currentData[index - 1].balance);
@@ -74,16 +74,27 @@ const Dashboard: React.FC = () => {
             // Only show points where balance changed (trade occurred)
             if (balanceChange === 0) return 0;
             
-            // Scale point size based on the relative size of the change
-            // For longer time ranges, use smaller points
-            const baseSize = timeRange === '6m' || timeRange === '3m' ? 2 : 3;
-            const maxSize = timeRange === '6m' || timeRange === '3m' ? 4 : 5;
+            // Scale point size based on the relative size of the change and timeframe
+            let baseSize, maxSize;
+            if (timeRange === '6m') {
+              baseSize = 1;
+              maxSize = 2;
+            } else if (timeRange === '3m') {
+              baseSize = 1.5;
+              maxSize = 2.5;
+            } else if (timeRange === '1m') {
+              baseSize = 2;
+              maxSize = 3;
+            } else {
+              baseSize = 2.5;
+              maxSize = 3.5;
+            }
             
             return baseSize + (balanceChange / maxChange) * (maxSize - baseSize);
           },
           pointHoverRadius: (context: any) => {
             const index = context.dataIndex;
-            if (index === 0 || index === currentData.length - 1) return 6;
+            if (index === 0 || index === currentData.length - 1) return 4;
             
             const balanceChange = Math.abs(currentData[index].balance - currentData[index - 1].balance);
             const maxChange = Math.max(...currentData.map((d, i) => 
@@ -92,9 +103,21 @@ const Dashboard: React.FC = () => {
             
             if (balanceChange === 0) return 0;
             
-            // Smaller hover sizes for longer time ranges
-            const baseSize = timeRange === '6m' || timeRange === '3m' ? 3 : 4;
-            const maxSize = timeRange === '6m' || timeRange === '3m' ? 5 : 6;
+            // Scale hover size based on timeframe
+            let baseSize, maxSize;
+            if (timeRange === '6m') {
+              baseSize = 1.5;
+              maxSize = 2.5;
+            } else if (timeRange === '3m') {
+              baseSize = 2;
+              maxSize = 3;
+            } else if (timeRange === '1m') {
+              baseSize = 2.5;
+              maxSize = 3.5;
+            } else {
+              baseSize = 3;
+              maxSize = 4;
+            }
             
             return baseSize + (balanceChange / maxChange) * (maxSize - baseSize);
           },
