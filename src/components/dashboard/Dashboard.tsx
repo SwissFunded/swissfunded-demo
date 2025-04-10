@@ -57,7 +57,7 @@ const Dashboard: React.FC = () => {
           data: currentData.map(d => d.balance),
           borderColor: '#ef4444',
           backgroundColor: 'rgba(239, 68, 68, 0.1)',
-          pointBackgroundColor: '#ffffff',
+          pointBackgroundColor: '#ef4444',
           pointBorderColor: '#ef4444',
           pointBorderWidth: 2,
           pointRadius: 4,
