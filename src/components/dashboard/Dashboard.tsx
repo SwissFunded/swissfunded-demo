@@ -46,6 +46,9 @@ const Dashboard: React.FC = () => {
   }, [currentData]);
 
   const chartData = useMemo(() => {
+    const isInProfit = currentData[currentData.length - 1].balance > currentData[0].balance;
+    const chartColor = isInProfit ? '#22c55e' : '#ef4444'; // Green for profit, red for loss
+    
     return {
       labels: currentData.map(d => {
         const date = new Date(d.date);
@@ -55,10 +58,10 @@ const Dashboard: React.FC = () => {
         {
           label: 'Balance',
           data: currentData.map(d => d.balance),
-          borderColor: '#ef4444',
-          backgroundColor: 'rgba(239, 68, 68, 0.1)',
-          pointBackgroundColor: '#ef4444',
-          pointBorderColor: '#ef4444',
+          borderColor: chartColor,
+          backgroundColor: isInProfit ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+          pointBackgroundColor: chartColor,
+          pointBorderColor: chartColor,
           pointBorderWidth: 2,
           pointRadius: (context: any) => {
             const index = context.dataIndex;
@@ -126,7 +129,7 @@ const Dashboard: React.FC = () => {
         }
       ]
     };
-  }, [currentData]);
+  }, [currentData, timeRange]);
 
   const chartOptions = {
     responsive: true,
