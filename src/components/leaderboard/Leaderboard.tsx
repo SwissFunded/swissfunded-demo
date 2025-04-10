@@ -35,6 +35,39 @@ const successfulTraders = [
     favoritePairs: ['USD/CAD', 'NZD/USD'],
     image: 'https://randomuser.me/api/portraits/women/68.jpg',
     rank: 3
+  },
+  {
+    id: 4,
+    name: 'James Anderson',
+    profit: 95000,
+    winRate: 77.8,
+    profitFactor: 2.9,
+    strategy: 'Scalping',
+    favoritePairs: ['EUR/JPY', 'AUD/USD'],
+    image: 'https://randomuser.me/api/portraits/men/45.jpg',
+    rank: 4
+  },
+  {
+    id: 5,
+    name: 'Sophia Martinez',
+    profit: 88000,
+    winRate: 76.5,
+    profitFactor: 2.7,
+    strategy: 'Swing Trading',
+    favoritePairs: ['USD/CHF', 'GBP/CHF'],
+    image: 'https://randomuser.me/api/portraits/women/33.jpg',
+    rank: 5
+  },
+  {
+    id: 6,
+    name: 'David Kim',
+    profit: 82000,
+    winRate: 75.2,
+    profitFactor: 2.6,
+    strategy: 'Position Trading',
+    favoritePairs: ['USD/JPY', 'EUR/CHF'],
+    image: 'https://randomuser.me/api/portraits/men/22.jpg',
+    rank: 6
   }
 ];
 
