@@ -5,6 +5,7 @@ import Sidebar from './components/sidebar/Sidebar';
 import Dashboard from './components/dashboard/Dashboard';
 import DetailedStats from './components/statistics/DetailedStats';
 import Tutorials from './components/tutorials/Tutorials';
+import Calendar from './components/calendar/Calendar';
 import Logo from './components/Logo';
 
 const AppContent: React.FC = () => {
@@ -32,6 +33,7 @@ const AppContent: React.FC = () => {
               <Route path="/" element={<Dashboard />} />
               <Route path="/statistics" element={<DetailedStats />} />
               <Route path="/tutorials" element={<Tutorials />} />
+              <Route path="/calendar" element={<Calendar />} />
             </Routes>
           </motion.div>
         </div>
