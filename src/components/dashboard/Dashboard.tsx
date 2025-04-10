@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import ChallengeCard from '../challenge/ChallengeCard';
+import { tradeData } from '../../data/tradeData';
+import { getTimeRangeData, calculateStats, getChartData } from '../../utils/tradeDataUtils';
 
 const mockBalanceHistory = [
   // September 2023 - Starting with small consistent growth
@@ -304,38 +306,55 @@ const CustomDot = (props: any) => {
 
 const Dashboard: React.FC = () => {
   type TimePeriod = '1D' | '1W' | '1M' | '3M' | 'ALL';
-  const [timePeriod, setTimePeriod] = useState<TimePeriod>('1M');
+  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('ALL');
   const [showTradeHistory, setShowTradeHistory] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState('balance');
 
-  const timePeriods: Record<TimePeriod, number> = {
+  const daysMap = {
     '1D': 1,
     '1W': 7,
     '1M': 30,
     '3M': 90,
-    'ALL': mockBalanceHistory.length
+    'ALL': Infinity
   };
 
-  const getFilteredData = (period: TimePeriod) => {
-    const days = timePeriods[period];
-    if (period === 'ALL') {
-      return mockBalanceHistory;
-    }
-    return mockBalanceHistory.slice(-days);
-  };
+  const currentData = useMemo(() => {
+    return getTimeRangeData(tradeData, daysMap[selectedPeriod]);
+  }, [selectedPeriod]);
 
-  const filteredData = getFilteredData(timePeriod);
+  const stats = useMemo(() => {
+    return calculateStats(currentData);
+  }, [currentData]);
+
+  const chartData = useMemo(() => {
+    return getChartData(currentData);
+  }, [currentData]);
+
+  // Calculate performance metrics from real data
+  const totalTrades = stats.totalTrades;
+  const averageWinRate = stats.winRate;
+  const totalProfit = stats.totalPnL;
+  const averageDailyProfit = totalProfit / (currentData.length - 1);
+  const largestDailyProfit = Math.max(...currentData.map((trade, i) => 
+    i > 0 ? trade.balance - currentData[i - 1].balance : 0
+  ));
+  const averageTradesPerDay = totalTrades / (currentData.length - 1);
+  const profitableDays = currentData.filter((trade, i) => 
+    i > 0 && trade.balance > currentData[i - 1].balance
+  ).length;
+  const winRateDays = currentData.filter(trade => trade.pnl > 0).length;
+  const averageDailyWinRate = (winRateDays / currentData.length) * 100;
 
   const riskMetrics = {
-    maxDrawdown: Math.min(...mockBalanceHistory.map(day => 
-      ((day.balance - Math.max(...mockBalanceHistory.slice(0, mockBalanceHistory.indexOf(day) + 1).map(d => d.balance))) / 
-      Math.max(...mockBalanceHistory.slice(0, mockBalanceHistory.indexOf(day) + 1).map(d => d.balance))) * 100
+    maxDrawdown: Math.min(...currentData.map(day => 
+      ((day.balance - Math.max(...currentData.slice(0, currentData.indexOf(day) + 1).map(d => d.balance))) / 
+      Math.max(...currentData.slice(0, currentData.indexOf(day) + 1).map(d => d.balance))) * 100
     )),
-    averageDailyLoss: mockBalanceHistory.filter(day => day.balance < mockBalanceHistory[mockBalanceHistory.indexOf(day) - 1]?.balance)
-      .reduce((sum, day, i, arr) => sum + (day.balance - mockBalanceHistory[mockBalanceHistory.indexOf(day) - 1]?.balance), 0) / 
-      mockBalanceHistory.filter(day => day.balance < mockBalanceHistory[mockBalanceHistory.indexOf(day) - 1]?.balance).length,
-    consecutiveLosses: Math.max(...mockBalanceHistory.reduce((acc, day) => {
-      if (day.balance < mockBalanceHistory[mockBalanceHistory.indexOf(day) - 1]?.balance) {
+    averageDailyLoss: currentData.filter(day => day.balance < currentData[currentData.indexOf(day) - 1]?.balance)
+      .reduce((sum, day, i, arr) => sum + (day.balance - currentData[currentData.indexOf(day) - 1]?.balance), 0) / 
+      currentData.filter(day => day.balance < currentData[currentData.indexOf(day) - 1]?.balance).length,
+    consecutiveLosses: Math.max(...currentData.reduce((acc, day) => {
+      if (day.balance < currentData[currentData.indexOf(day) - 1]?.balance) {
         acc[acc.length - 1]++;
       } else {
         acc.push(0);
@@ -376,16 +395,16 @@ const Dashboard: React.FC = () => {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <p className="text-[#cccccc] text-sm">Account Balance</p>
-                  <p className="text-3xl font-bold text-[#e74c3c] mt-1">${mockBalanceHistory[mockBalanceHistory.length - 1].balance.toLocaleString()}</p>
+                  <p className="text-3xl font-bold text-[#e74c3c] mt-1">${currentData[currentData.length - 1].balance.toLocaleString()}</p>
                   <p className="text-sm text-[#cccccc] mt-1">+20% from start</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {Object.keys(timePeriods).map((period) => (
+                  {Object.keys(daysMap).map((period) => (
                     <button
                       key={period}
-                      onClick={() => setTimePeriod(period as TimePeriod)}
+                      onClick={() => setSelectedPeriod(period as TimePeriod)}
                       className={`px-3 py-1 rounded-lg text-sm ${
-                        timePeriod === period
+                        selectedPeriod === period
                           ? 'bg-[#e74c3c] text-white'
                           : 'bg-[#2a2a2a] text-[#cccccc] hover:bg-[#3a3a3a]'
                       }`}
@@ -397,42 +416,42 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={filteredData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+                  <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid 
+                      strokeDasharray="0"
+                      vertical={false}
+                      horizontal={true}
+                      stroke="rgba(255, 255, 255, 0.05)"
+                    />
                     <XAxis 
                       dataKey="date" 
-                      stroke="#666" 
-                      tick={{ fill: '#666' }}
-                      tickFormatter={(value) => value.split('-')[2]}
+                      stroke="#888888"
+                      tick={{ fill: '#888888' }}
                     />
                     <YAxis 
-                      stroke="#666" 
-                      tick={{ fill: '#666' }}
-                      tickFormatter={(value) => `$${value}`}
-                    />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: '#1a1a1a',
-                        border: '1px solid #2a2a2a',
-                        borderRadius: '4px'
-                      }}
-                      labelStyle={{ color: '#666' }}
-                      formatter={(value: any) => [`$${value}`, 'Balance']}
+                      stroke="#888888"
+                      tick={{ fill: '#888888' }}
+                      tickFormatter={(value) => `$${value.toLocaleString()}`}
                     />
                     <Line 
                       type="monotone" 
                       dataKey="balance" 
-                      stroke="#e74c3c"
-                      strokeWidth={2.5}
-                      dot={CustomDot}
+                      stroke="#c0392b"
+                      strokeWidth={2}
+                      dot={{
+                        r: 4,
+                        fill: '#c0392b',
+                        stroke: '#c0392b',
+                        strokeWidth: 2
+                      }}
                       activeDot={{
                         r: 6,
-                        fill: "#e74c3c",
-                        stroke: "#e74c3c",
-                        strokeWidth: 2,
-                        style: { filter: 'drop-shadow(0 0 8px rgba(231, 76, 60, 0.6))' }
+                        fill: '#c0392b',
+                        stroke: '#c0392b',
+                        strokeWidth: 2
                       }}
-                      animationDuration={2000}
+                      animationDuration={1500}
+                      animationEasing="ease-in-out"
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -474,7 +493,7 @@ const Dashboard: React.FC = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-[#cccccc]">Profitable Days</span>
-                  <span className="text-[#e74c3c] font-medium">{profitableDays}/{mockBalanceHistory.length - 1}</span>
+                  <span className="text-[#e74c3c] font-medium">{profitableDays}/{currentData.length - 1}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-[#cccccc]">Consecutive Losses</span>
@@ -517,7 +536,7 @@ const Dashboard: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {mockBalanceHistory.map((day, index) => (
+                    {currentData.map((day, index) => (
                       <tr key={index} className="border-b border-[#2a2a2a]">
                         <td className="py-4 text-white">{day.date}</td>
                         <td className="py-4 text-white">EURUSD</td>
