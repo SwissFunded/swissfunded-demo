@@ -5,8 +5,8 @@ const axios = require('axios');
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Finnhub API key
-const FINNHUB_API_KEY = 'cvs1dahr01qp7viu6ff0cvs1dahr01qp7viu6ffg';
+// Alpha Vantage API key
+const ALPHA_VANTAGE_API_KEY = '8HPA8P1L9XGJLTPE';
 
 // Configure CORS with specific options
 app.use(cors({
@@ -76,33 +76,39 @@ app.get('/api/forex-news', async (req, res) => {
       return res.json(newsCache.data);
     }
 
-    console.log('Fetching news from Finnhub...');
-    const response = await axios.get('https://finnhub.io/api/v1/news', {
+    console.log('Fetching news from Alpha Vantage...');
+    const response = await axios.get('https://www.alphavantage.co/query', {
       params: {
-        category: 'forex',
-        token: FINNHUB_API_KEY
-      },
-      headers: {
-        'X-Finnhub-Token': FINNHUB_API_KEY,
-        'Accept': 'application/json'
+        function: 'NEWS_SENTIMENT',
+        topics: 'forex',
+        apikey: ALPHA_VANTAGE_API_KEY
       }
     });
 
-    if (!response.data || !Array.isArray(response.data)) {
-      console.log('No data from Finnhub, falling back to mock data');
+    if (!response.data || !response.data.feed) {
+      console.log('No data from Alpha Vantage, falling back to mock data');
       return res.json(mockEvents);
     }
 
     // Transform the data to match our frontend expectations
-    const events = response.data.map(item => {
+    const events = response.data.feed.map(item => {
       try {
-        const publishedDate = new Date(item.datetime * 1000); // Convert Unix timestamp to Date
+        // Parse the time_published string (format: YYYYMMDDTHHMMSS)
+        const timeStr = item.time_published;
+        const year = timeStr.substring(0, 4);
+        const month = timeStr.substring(4, 6);
+        const day = timeStr.substring(6, 8);
+        const hour = timeStr.substring(9, 11);
+        const minute = timeStr.substring(11, 13);
+        
+        const publishedDate = new Date(`${year}-${month}-${day}T${hour}:${minute}:00`);
+        
         return {
           date: publishedDate.toISOString().split('T')[0],
           time: publishedDate.toLocaleTimeString(),
           currency: 'FOREX',
-          impact: getSentimentImpact(item.sentiment),
-          event: item.headline,
+          impact: getSentimentImpact(item.overall_sentiment_score),
+          event: item.title,
           forecast: item.summary?.substring(0, 200) + (item.summary?.length > 200 ? '...' : ''),
           previous: item.source
         };
@@ -152,5 +158,5 @@ function getSentimentImpact(score) {
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-  console.log(`Using Finnhub API`);
+  console.log(`Using Alpha Vantage API`);
 }); 
