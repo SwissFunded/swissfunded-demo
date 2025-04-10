@@ -58,72 +58,54 @@ const Leaderboard: React.FC = () => {
       <div>
         <h2 className="text-2xl font-heading tracking-tight mb-6">Top Traders</h2>
         
-        {/* Podium Section */}
-        <div className="relative h-[500px] mb-12">
-          {/* Podium Base */}
-          <div className="absolute bottom-0 left-0 right-0 h-[200px] flex justify-center items-end gap-4 px-8">
-            {/* Bronze (3rd place) */}
-            <div className="w-[200px] h-[120px] bg-[#CD7F32] rounded-t-2xl shadow-lg relative">
-              <div className="absolute -top-2 left-0 right-0 h-2 bg-[#CD7F32] rounded-t-2xl"></div>
-              <div className="absolute -top-4 left-0 right-0 h-2 bg-[#CD7F32] rounded-t-2xl"></div>
-            </div>
-            
-            {/* Gold (1st place) */}
-            <div className="w-[240px] h-[160px] bg-[#FFD700] rounded-t-2xl shadow-lg relative">
-              <div className="absolute -top-2 left-0 right-0 h-2 bg-[#FFD700] rounded-t-2xl"></div>
-              <div className="absolute -top-4 left-0 right-0 h-2 bg-[#FFD700] rounded-t-2xl"></div>
-              <div className="absolute -top-6 left-0 right-0 h-2 bg-[#FFD700] rounded-t-2xl"></div>
-            </div>
-            
-            {/* Silver (2nd place) */}
-            <div className="w-[200px] h-[140px] bg-[#C0C0C0] rounded-t-2xl shadow-lg relative">
-              <div className="absolute -top-2 left-0 right-0 h-2 bg-[#C0C0C0] rounded-t-2xl"></div>
-              <div className="absolute -top-4 left-0 right-0 h-2 bg-[#C0C0C0] rounded-t-2xl"></div>
-            </div>
-          </div>
+        {/* Top 3 Traders */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {sortedTraders.slice(0, 3).map((trader, index) => (
+            <motion.div
+              key={trader.id}
+              whileHover={{ scale: 1.02 }}
+              className={`bg-background-light rounded-xl p-6 relative ${
+                index === 1 ? 'md:order-1' : index === 0 ? 'md:order-2' : 'md:order-3'
+              }`}
+            >
+              {/* Rank Badge */}
+              <div className={`absolute -top-4 -right-4 w-16 h-16 rounded-full flex items-center justify-center ${
+                index === 1 ? 'bg-[#FFD700]' : index === 0 ? 'bg-[#C0C0C0]' : 'bg-[#CD7F32]'
+              }`}>
+                <span className="text-2xl font-bold text-background">{index + 1}</span>
+              </div>
 
-          {/* Traders on Podium */}
-          <div className="absolute bottom-0 left-0 right-0 flex justify-center items-end gap-8 px-8">
-            {sortedTraders.slice(0, 3).map((trader, index) => (
-              <motion.div
-                key={trader.id}
-                whileHover={{ scale: 1.05 }}
-                className={`flex flex-col items-center ${
-                  index === 1 ? 'mb-[180px]' : index === 0 ? 'mb-[140px]' : 'mb-[160px]'
-                }`}
-              >
-                <div className="relative">
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    {index === 1 && (
-                      <div className="bg-[#FFD700] rounded-full p-2 shadow-lg">
-                        <TrophyIcon className="w-8 h-8 text-background" />
-                      </div>
-                    )}
-                    {index === 0 && (
-                      <div className="bg-[#C0C0C0] rounded-full p-2 shadow-lg">
-                        <TrophyIcon className="w-8 h-8 text-background" />
-                      </div>
-                    )}
-                    {index === 2 && (
-                      <div className="bg-[#CD7F32] rounded-full p-2 shadow-lg">
-                        <TrophyIcon className="w-8 h-8 text-background" />
-                      </div>
-                    )}
+              <div className="flex flex-col items-center">
+                <img
+                  src={trader.image}
+                  alt={trader.name}
+                  className="w-24 h-24 rounded-full object-cover border-4 border-background mb-4"
+                />
+                <h3 className="text-xl font-medium mb-1">{trader.name}</h3>
+                <p className="text-sm text-text-muted mb-2">{trader.strategy}</p>
+                <div className="flex items-center gap-2 mb-4">
+                  <TrophyIcon className={`w-5 h-5 ${
+                    index === 1 ? 'text-[#FFD700]' : index === 0 ? 'text-[#C0C0C0]' : 'text-[#CD7F32]'
+                  }`} />
+                  <span className="text-green-500 font-medium">${trader.profit.toLocaleString()}</span>
+                </div>
+                <div className="w-full space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-text-muted">Win Rate</span>
+                    <span className="text-green-500 font-medium">{trader.winRate}%</span>
                   </div>
-                  <img
-                    src={trader.image}
-                    alt={trader.name}
-                    className="w-24 h-24 rounded-full object-cover border-4 border-background-light shadow-lg"
-                  />
+                  <div className="flex justify-between items-center">
+                    <span className="text-text-muted">Profit Factor</span>
+                    <span className="text-green-500 font-medium">{trader.profitFactor}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-text-muted">Favorite Pairs</span>
+                    <span className="text-text-muted">{trader.favoritePairs.join(', ')}</span>
+                  </div>
                 </div>
-                <div className="text-center mt-4">
-                  <h3 className="text-lg font-medium">{trader.name}</h3>
-                  <p className="text-sm text-text-muted">{trader.strategy}</p>
-                  <p className="text-green-500 font-medium mt-1">${trader.profit.toLocaleString()}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
         {/* Other Traders Grid */}
