@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 interface NewsEvent {
@@ -11,8 +11,8 @@ interface NewsEvent {
   previous: string;
 }
 
-// Use environment variable for API URL
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/forex-news';
+// Use production server URL
+const API_URL = 'https://swissfunded-demo-server.vercel.app/api/forex-news';
 
 // Cache duration in milliseconds (5 minutes)
 const CACHE_DURATION = 5 * 60 * 1000;
@@ -22,22 +22,17 @@ const Calendar: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const cache = useRef<{ data: NewsEvent[]; timestamp: number } | null>(null);
   const maxRetries = 3;
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
         // Check cache first
-        const cachedData = localStorage.getItem('forexNewsCache');
-        const cacheTimestamp = localStorage.getItem('forexNewsCacheTimestamp');
-        
-        if (cachedData && cacheTimestamp) {
-          const timestamp = parseInt(cacheTimestamp);
-          if (Date.now() - timestamp < CACHE_DURATION) {
-            setEvents(JSON.parse(cachedData));
-            setLoading(false);
-            return;
-          }
+        if (cache.current && Date.now() - cache.current.timestamp < CACHE_DURATION) {
+          setEvents(cache.current.data);
+          setLoading(false);
+          return;
         }
 
         const response = await fetch(API_URL);
@@ -47,8 +42,7 @@ const Calendar: React.FC = () => {
         const data = await response.json();
         
         // Cache the data
-        localStorage.setItem('forexNewsCache', JSON.stringify(data));
-        localStorage.setItem('forexNewsCacheTimestamp', Date.now().toString());
+        cache.current = { data, timestamp: Date.now() };
         
         setEvents(data);
         setError(null);
