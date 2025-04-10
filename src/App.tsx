@@ -35,23 +35,19 @@ const AppContent: React.FC = () => {
         <Sidebar />
         <div className="flex-1 ml-64 mt-[72px]">
           <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-              <Route path="/" element={
-                <PageTransition>
-                  <Dashboard />
-                </PageTransition>
-              } />
-              <Route path="/statistics" element={
-                <PageTransition>
-                  <DetailedStats />
-                </PageTransition>
-              } />
-              <Route path="/tutorials" element={
-                <PageTransition>
-                  <Tutorials />
-                </PageTransition>
-              } />
-            </Routes>
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Routes location={location}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/statistics" element={<DetailedStats />} />
+                <Route path="/tutorials" element={<Tutorials />} />
+              </Routes>
+            </motion.div>
           </AnimatePresence>
         </div>
       </div>
