@@ -7,19 +7,6 @@ import DetailedStats from './components/statistics/DetailedStats';
 import Tutorials from './components/tutorials/Tutorials';
 import Logo from './components/Logo';
 
-const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.3 }}
-    >
-      {children}
-    </motion.div>
-  );
-};
-
 const AppContent: React.FC = () => {
   const location = useLocation();
 
@@ -34,20 +21,39 @@ const AppContent: React.FC = () => {
       <div className="relative flex">
         <Sidebar />
         <div className="flex-1 ml-64 mt-[72px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Routes location={location}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/statistics" element={<DetailedStats />} />
-                <Route path="/tutorials" element={<Tutorials />} />
-              </Routes>
-            </motion.div>
+          <AnimatePresence>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Dashboard />
+                </motion.div>
+              } />
+              <Route path="/statistics" element={
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <DetailedStats />
+                </motion.div>
+              } />
+              <Route path="/tutorials" element={
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Tutorials />
+                </motion.div>
+              } />
+            </Routes>
           </AnimatePresence>
         </div>
       </div>
