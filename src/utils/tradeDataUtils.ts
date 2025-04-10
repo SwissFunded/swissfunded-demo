@@ -21,7 +21,9 @@ export const calculateStats = (data: TradeDataPoint[]) => {
       totalPnL: 0,
       startBalance: 0,
       endBalance: 0,
-      percentageGain: 0
+      percentageGain: 0,
+      wins: 0,
+      losses: 0
     };
   }
 
@@ -49,7 +51,9 @@ export const calculateStats = (data: TradeDataPoint[]) => {
     totalPnL,
     startBalance,
     endBalance,
-    percentageGain
+    percentageGain,
+    wins,
+    losses
   };
 };
 
