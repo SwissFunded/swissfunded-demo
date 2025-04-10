@@ -59,51 +59,62 @@ const Leaderboard: React.FC = () => {
         <h2 className="text-2xl font-heading tracking-tight mb-6">Top Traders</h2>
         
         {/* Podium Section */}
-        <div className="relative h-[400px] mb-12">
+        <div className="relative h-[500px] mb-12">
           {/* Podium Base */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-background-light rounded-t-xl flex">
-            <div className="flex-1 h-full flex items-end justify-center">
-              <div className="w-full h-24 bg-[#CD7F32] rounded-t-xl"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-[200px] flex justify-center items-end gap-4 px-8">
+            {/* Bronze (3rd place) */}
+            <div className="w-[200px] h-[120px] bg-[#CD7F32] rounded-t-2xl shadow-lg relative">
+              <div className="absolute -top-2 left-0 right-0 h-2 bg-[#CD7F32] rounded-t-2xl"></div>
+              <div className="absolute -top-4 left-0 right-0 h-2 bg-[#CD7F32] rounded-t-2xl"></div>
             </div>
-            <div className="flex-1 h-full flex items-end justify-center">
-              <div className="w-full h-32 bg-[#C0C0C0] rounded-t-xl"></div>
+            
+            {/* Gold (1st place) */}
+            <div className="w-[240px] h-[160px] bg-[#FFD700] rounded-t-2xl shadow-lg relative">
+              <div className="absolute -top-2 left-0 right-0 h-2 bg-[#FFD700] rounded-t-2xl"></div>
+              <div className="absolute -top-4 left-0 right-0 h-2 bg-[#FFD700] rounded-t-2xl"></div>
+              <div className="absolute -top-6 left-0 right-0 h-2 bg-[#FFD700] rounded-t-2xl"></div>
             </div>
-            <div className="flex-1 h-full flex items-end justify-center">
-              <div className="w-full h-28 bg-[#FFD700] rounded-t-xl"></div>
+            
+            {/* Silver (2nd place) */}
+            <div className="w-[200px] h-[140px] bg-[#C0C0C0] rounded-t-2xl shadow-lg relative">
+              <div className="absolute -top-2 left-0 right-0 h-2 bg-[#C0C0C0] rounded-t-2xl"></div>
+              <div className="absolute -top-4 left-0 right-0 h-2 bg-[#C0C0C0] rounded-t-2xl"></div>
             </div>
           </div>
 
           {/* Traders on Podium */}
-          <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-8 px-8">
+          <div className="absolute bottom-0 left-0 right-0 flex justify-center items-end gap-8 px-8">
             {sortedTraders.slice(0, 3).map((trader, index) => (
               <motion.div
                 key={trader.id}
                 whileHover={{ scale: 1.05 }}
-                className={`flex-1 flex flex-col items-center ${
-                  index === 1 ? 'mb-32' : index === 0 ? 'mb-24' : 'mb-28'
+                className={`flex flex-col items-center ${
+                  index === 1 ? 'mb-[180px]' : index === 0 ? 'mb-[140px]' : 'mb-[160px]'
                 }`}
               >
                 <div className="relative">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    {index === 1 && (
+                      <div className="bg-[#FFD700] rounded-full p-2 shadow-lg">
+                        <TrophyIcon className="w-8 h-8 text-background" />
+                      </div>
+                    )}
+                    {index === 0 && (
+                      <div className="bg-[#C0C0C0] rounded-full p-2 shadow-lg">
+                        <TrophyIcon className="w-8 h-8 text-background" />
+                      </div>
+                    )}
+                    {index === 2 && (
+                      <div className="bg-[#CD7F32] rounded-full p-2 shadow-lg">
+                        <TrophyIcon className="w-8 h-8 text-background" />
+                      </div>
+                    )}
+                  </div>
                   <img
                     src={trader.image}
                     alt={trader.name}
-                    className="w-20 h-20 rounded-full object-cover border-4 border-background-light"
+                    className="w-24 h-24 rounded-full object-cover border-4 border-background-light shadow-lg"
                   />
-                  {index === 1 && (
-                    <div className="absolute -top-2 -right-2 bg-[#FFD700] rounded-full p-1">
-                      <TrophyIcon className="w-6 h-6 text-background" />
-                    </div>
-                  )}
-                  {index === 0 && (
-                    <div className="absolute -top-2 -right-2 bg-[#C0C0C0] rounded-full p-1">
-                      <TrophyIcon className="w-6 h-6 text-background" />
-                    </div>
-                  )}
-                  {index === 2 && (
-                    <div className="absolute -top-2 -right-2 bg-[#CD7F32] rounded-full p-1">
-                      <TrophyIcon className="w-6 h-6 text-background" />
-                    </div>
-                  )}
                 </div>
                 <div className="text-center mt-4">
                   <h3 className="text-lg font-medium">{trader.name}</h3>
