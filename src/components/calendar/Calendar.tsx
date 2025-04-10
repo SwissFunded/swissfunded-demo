@@ -155,64 +155,68 @@ const Calendar: React.FC = () => {
       className="space-y-6"
     >
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
-        <div>
-          <label className="block text-sm font-medium text-[#cccccc] mb-2">Currency Pair</label>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-[#cccccc]">Currency Pair</label>
           <select
             value={selectedCurrency}
             onChange={(e) => setSelectedCurrency(e.target.value)}
-            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-3 py-2 focus:border-primary focus:ring-primary"
+            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-4 py-2.5 focus:border-primary focus:ring-primary focus:ring-1 transition-colors appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNC42NjY3NSAxMi4zMzM0TDEyLjMzMzQgNC42NjY3NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik00LjY2Njc1IDQuNjY2NzVMMTIuMzMzNCAxMi4zMzM0IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+')] bg-no-repeat bg-[right_1rem_center]"
           >
-            <option value="all">All Pairs</option>
+            <option value="all" className="bg-[#2a2a2a]">All Pairs</option>
             {uniqueCurrencies.map(currency => (
-              <option key={currency} value={currency}>{currency}</option>
+              <option key={currency} value={currency} className="bg-[#2a2a2a]">{currency}</option>
             ))}
           </select>
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-[#cccccc] mb-2">Impact</label>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-[#cccccc]">Impact</label>
           <select
             value={selectedImpact}
             onChange={(e) => setSelectedImpact(e.target.value)}
-            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-3 py-2 focus:border-primary focus:ring-primary"
+            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-4 py-2.5 focus:border-primary focus:ring-primary focus:ring-1 transition-colors appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNC42NjY3NSAxMi4zMzM0TDEyLjMzMzQgNC42NjY3NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik00LjY2Njc1IDQuNjY2NzVMMTIuMzMzNCAxMi4zMzM0IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+')] bg-no-repeat bg-[right_1rem_center]"
           >
-            <option value="all">All Impacts</option>
+            <option value="all" className="bg-[#2a2a2a]">All Impacts</option>
             {uniqueImpacts.map(impact => (
-              <option key={impact} value={impact}>{impact}</option>
+              <option key={impact} value={impact} className="bg-[#2a2a2a]">{impact}</option>
             ))}
           </select>
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-[#cccccc] mb-2">Event</label>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-[#cccccc]">Event</label>
           <select
             value={selectedEvent}
             onChange={(e) => setSelectedEvent(e.target.value)}
-            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-3 py-2 focus:border-primary focus:ring-primary"
+            className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-4 py-2.5 focus:border-primary focus:ring-primary focus:ring-1 transition-colors appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNC42NjY3NSAxMi4zMzM0TDEyLjMzMzQgNC42NjY3NSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik00LjY2Njc1IDQuNjY2NzVMMTIuMzMzNCAxMi4zMzM0IiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+')] bg-no-repeat bg-[right_1rem_center]"
           >
-            <option value="all">All Events</option>
+            <option value="all" className="bg-[#2a2a2a]">All Events</option>
             {uniqueEvents.map(event => (
-              <option key={event} value={event}>{event}</option>
+              <option key={event} value={event} className="bg-[#2a2a2a]">{event}</option>
             ))}
           </select>
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-[#cccccc] mb-2">Date Range</label>
-          <div className="flex space-x-2">
-            <input
-              type="date"
-              value={dateRange.start}
-              onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-              className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-3 py-2 focus:border-primary focus:ring-primary"
-            />
-            <input
-              type="date"
-              value={dateRange.end}
-              onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-              className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-3 py-2 focus:border-primary focus:ring-primary"
-            />
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-[#cccccc]">Date Range</label>
+          <div className="flex space-x-3">
+            <div className="flex-1">
+              <input
+                type="date"
+                value={dateRange.start}
+                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-4 py-2.5 focus:border-primary focus:ring-primary focus:ring-1 transition-colors"
+              />
+            </div>
+            <div className="flex-1">
+              <input
+                type="date"
+                value={dateRange.end}
+                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                className="w-full bg-[#2a2a2a] border border-[#3a3a3a] text-white rounded-lg px-4 py-2.5 focus:border-primary focus:ring-primary focus:ring-1 transition-colors"
+              />
+            </div>
           </div>
         </div>
       </div>
