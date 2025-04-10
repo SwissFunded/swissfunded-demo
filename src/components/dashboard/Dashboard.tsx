@@ -26,7 +26,7 @@ const CustomDot = (props: any) => {
 
 const Dashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState<'1d' | '1w' | '1m' | '3m'>('1m');
-  const [isLoading, setIsLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   const daysMap = {
     '1d': 1,
@@ -51,24 +51,8 @@ const Dashboard: React.FC = () => {
   }, [currentData]);
 
   useEffect(() => {
-    setIsLoading(false);
+    setMounted(true);
   }, []);
-
-  if (isLoading) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="text-center">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!chartData.length) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="text-center">No data available for the selected time range.</div>
-      </div>
-    );
-  }
 
   return (
     <div className="p-6 space-y-6">
@@ -128,44 +112,53 @@ const Dashboard: React.FC = () => {
             </button>
           </div>
         </div>
-        <div className="h-[400px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis 
-                dataKey="date" 
-                stroke="rgba(255,255,255,0.5)"
-                tickFormatter={(value) => {
-                  const date = new Date(value);
-                  return `${date.getMonth() + 1}/${date.getDate()}`;
-                }}
-              />
-              <YAxis 
-                stroke="rgba(255,255,255,0.5)"
-                tickFormatter={(value) => `$${value.toLocaleString()}`}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#1F2937',
-                  border: 'none',
-                  borderRadius: '0.5rem',
-                  padding: '1rem'
-                }}
-                labelStyle={{ color: 'rgba(255,255,255,0.7)' }}
-                formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Balance']}
-              />
-              <Line
-                type="monotone"
-                dataKey="balance"
-                stroke="#ef4444"
-                strokeWidth={2}
-                dot={<CustomDot />}
-                activeDot={{ r: 8, fill: '#ef4444' }}
-                isAnimationActive={true}
-                animationDuration={1000}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+        <div className="h-[400px] w-full">
+          {mounted && (
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                <defs>
+                  <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="rgba(255,255,255,0.5)"
+                  tickFormatter={(value) => {
+                    const date = new Date(value);
+                    return `${date.getMonth() + 1}/${date.getDate()}`;
+                  }}
+                />
+                <YAxis 
+                  stroke="rgba(255,255,255,0.5)"
+                  tickFormatter={(value) => `$${value.toLocaleString()}`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1F2937',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    padding: '1rem'
+                  }}
+                  labelStyle={{ color: 'rgba(255,255,255,0.7)' }}
+                  formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Balance']}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="balance"
+                  stroke="#ef4444"
+                  strokeWidth={2}
+                  dot={<CustomDot />}
+                  activeDot={{ r: 8, fill: '#ef4444' }}
+                  isAnimationActive={true}
+                  animationDuration={1000}
+                  fill="url(#colorBalance)"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </div>
