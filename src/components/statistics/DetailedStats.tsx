@@ -293,6 +293,12 @@ const DetailedStats: React.FC = () => {
               >
                 3M
               </button>
+              <button
+                onClick={() => setTimeRange('6m')}
+                className={`px-4 py-2 rounded-lg ${timeRange === '6m' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
+              >
+                6M
+              </button>
             </div>
             <div className="h-[300px]">
               <Line data={chartData} options={chartOptions} />
