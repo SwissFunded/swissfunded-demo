@@ -1,6 +1,6 @@
-import { TradeData } from '../data/tradeData';
+import { TradeDataPoint } from '../data/tradeData';
 
-export const getTimeRangeData = (data: TradeData[], days: number) => {
+export const getTimeRangeData = (data: TradeDataPoint[], days: number) => {
   const now = new Date();
   const startDate = new Date(now);
   startDate.setDate(startDate.getDate() - days);
@@ -13,11 +13,9 @@ export const getTimeRangeData = (data: TradeData[], days: number) => {
   });
 };
 
-export const calculateStats = (data: TradeData[]) => {
+export const calculateStats = (data: TradeDataPoint[]) => {
   if (!data.length) {
     return {
-      wins: 0,
-      losses: 0,
       totalTrades: 0,
       winRate: 0,
       totalPnL: 0,
@@ -27,19 +25,25 @@ export const calculateStats = (data: TradeData[]) => {
     };
   }
 
-  const wins = data.filter(item => item.result === 'Win').length;
-  const losses = data.filter(item => item.result === 'Loss').length;
+  // Calculate trades and win rate by looking at balance changes
+  let wins = 0;
+  let losses = 0;
+
+  for (let i = 1; i < data.length; i++) {
+    const pnl = data[i].balance - data[i-1].balance;
+    if (pnl > 0) wins++;
+    else if (pnl < 0) losses++;
+  }
+
   const totalTrades = wins + losses;
   const winRate = totalTrades > 0 ? (wins / totalTrades) * 100 : 0;
   
-  const totalPnL = data.reduce((sum, item) => sum + item.pnl, 0);
-  const startBalance = data[0].balance - data[0].pnl; // Adjust for the first trade's PnL
+  const startBalance = data[0].balance;
   const endBalance = data[data.length - 1].balance;
-  const percentageGain = startBalance > 0 ? ((endBalance - startBalance) / startBalance) * 100 : 0;
+  const totalPnL = endBalance - startBalance;
+  const percentageGain = ((endBalance - startBalance) / startBalance) * 100;
 
   return {
-    wins,
-    losses,
     totalTrades,
     winRate,
     totalPnL,
@@ -49,12 +53,11 @@ export const calculateStats = (data: TradeData[]) => {
   };
 };
 
-export const getChartData = (data: TradeData[]) => {
+export const getChartData = (data: TradeDataPoint[]) => {
   if (!data.length) return [];
   
   return data.map(item => ({
-    date: new Date(item.date).toLocaleDateString(),
-    balance: item.balance,
-    pnl: item.pnl
+    date: item.date,
+    balance: item.balance
   }));
 }; 
