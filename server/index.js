@@ -29,6 +29,13 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+// Cache implementation
+let newsCache = {
+  data: null,
+  timestamp: null,
+  expiry: 5 * 60 * 1000 // 5 minutes
+};
+
 // Mock data for fallback
 const mockEvents = [
   {
@@ -62,6 +69,13 @@ const mockEvents = [
 
 app.get('/api/forex-news', async (req, res) => {
   try {
+    // Check cache first
+    if (newsCache.data && newsCache.timestamp && 
+        (Date.now() - newsCache.timestamp) < newsCache.expiry) {
+      console.log('Returning cached news data');
+      return res.json(newsCache.data);
+    }
+
     console.log('Fetching news from Finnhub...');
     const response = await axios.get('https://finnhub.io/api/v1/news', {
       params: {
@@ -103,12 +117,22 @@ app.get('/api/forex-news', async (req, res) => {
       return res.json(mockEvents);
     }
 
+    // Update cache
+    newsCache.data = events;
+    newsCache.timestamp = Date.now();
+
     console.log(`Successfully processed ${events.length} news items`);
     res.json(events);
   } catch (error) {
     console.error('Error fetching forex news:', error.message);
     if (error.response?.data) {
       console.error('API Response:', error.response.data);
+    }
+    
+    // If we have cached data, return it even if it's expired
+    if (newsCache.data) {
+      console.log('Returning expired cached data due to API error');
+      return res.json(newsCache.data);
     }
     
     console.log('Error occurred, falling back to mock data');
