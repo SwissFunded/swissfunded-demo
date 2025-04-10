@@ -35,7 +35,7 @@ const AppContent: React.FC = () => {
         <Sidebar />
         <div className="flex-1 ml-64 mt-[72px]">
           <AnimatePresence mode="wait">
-            <Routes>
+            <Routes location={location} key={location.pathname}>
               <Route path="/" element={
                 <PageTransition>
                   <Dashboard />
