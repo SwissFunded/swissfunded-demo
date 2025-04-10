@@ -67,6 +67,32 @@ const mockEvents = [
   }
 ];
 
+// Helper function to parse Alpha Vantage time format
+function parseAlphaVantageTime(timeStr) {
+  try {
+    // Format: YYYYMMDDTHHMMSS
+    const year = timeStr.substring(0, 4);
+    const month = timeStr.substring(4, 6);
+    const day = timeStr.substring(6, 8);
+    const hour = timeStr.substring(9, 11);
+    const minute = timeStr.substring(11, 13);
+    
+    // Create date string in a format that works across all browsers
+    const dateStr = `${year}-${month}-${day}T${hour}:${minute}:00Z`;
+    const date = new Date(dateStr);
+    
+    // Validate the date
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date');
+    }
+    
+    return date;
+  } catch (error) {
+    console.error('Error parsing date:', error);
+    return new Date(); // Fallback to current date
+  }
+}
+
 app.get('/api/forex-news', async (req, res) => {
   try {
     // Check cache first
@@ -93,15 +119,7 @@ app.get('/api/forex-news', async (req, res) => {
     // Transform the data to match our frontend expectations
     const events = response.data.feed.map(item => {
       try {
-        // Parse the time_published string (format: YYYYMMDDTHHMMSS)
-        const timeStr = item.time_published;
-        const year = timeStr.substring(0, 4);
-        const month = timeStr.substring(4, 6);
-        const day = timeStr.substring(6, 8);
-        const hour = timeStr.substring(9, 11);
-        const minute = timeStr.substring(11, 13);
-        
-        const publishedDate = new Date(`${year}-${month}-${day}T${hour}:${minute}:00`);
+        const publishedDate = parseAlphaVantageTime(item.time_published);
         
         return {
           date: publishedDate.toISOString().split('T')[0],
