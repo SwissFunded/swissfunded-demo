@@ -305,146 +305,97 @@ const CustomDot = (props: any) => {
 };
 
 const Dashboard: React.FC = () => {
-  const [timeRange, setTimeRange] = useState<number>(30); // Default to 30 days
+  const [timeRange, setTimeRange] = useState<number>(30);
 
-  // Get data for the selected time range
-  const filteredData = useMemo(() => getTimeRangeData(tradeData, timeRange), [timeRange]);
-  
-  // Calculate statistics
-  const stats = useMemo(() => calculateStats(filteredData), [filteredData]);
-  
-  // Prepare chart data
-  const chartData = useMemo(() => getChartData(filteredData), [filteredData]);
+  const currentData = useMemo(() => {
+    return getTimeRangeData(tradeData, timeRange);
+  }, [timeRange]);
+
+  const stats = useMemo(() => {
+    return calculateStats(currentData);
+  }, [currentData]);
+
+  const chartData = useMemo(() => {
+    return getChartData(currentData);
+  }, [currentData]);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
-        
-        {/* Time Range Selector */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Time Range (days)
-          </label>
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(Number(e.target.value))}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          >
-            <option value={7}>7 days</option>
-            <option value={30}>30 days</option>
-            <option value={90}>90 days</option>
-            <option value={180}>180 days</option>
-          </select>
+    <div className="p-6 space-y-6">
+      <h1 className="text-3xl font-bold">Dashboard</h1>
+      
+      <div>
+        <label className="block text-sm font-medium mb-2">Time Range (days)</label>
+        <input
+          type="range"
+          min="1"
+          max="90"
+          value={timeRange}
+          onChange={(e) => setTimeRange(Number(e.target.value))}
+          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+        />
+        <div className="text-sm text-gray-500 mt-1">{timeRange} days</div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+          <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300">Total Trades</h3>
+          <p className="text-3xl font-bold mt-2">{stats.totalTrades}</p>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">Total Trades</h3>
-            <p className="text-2xl font-semibold text-gray-900">{stats.totalTrades}</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">Win Rate</h3>
-            <p className="text-2xl font-semibold text-gray-900">{stats.winRate.toFixed(1)}%</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">Total PnL</h3>
-            <p className="text-2xl font-semibold text-gray-900">${stats.totalPnL.toFixed(2)}</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">Percentage Gain</h3>
-            <p className="text-2xl font-semibold text-gray-900">{stats.percentageGain.toFixed(2)}%</p>
-          </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+          <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300">Win Rate</h3>
+          <p className="text-3xl font-bold mt-2">{stats.winRate.toFixed(1)}%</p>
         </div>
 
-        {/* Balance Chart */}
-        <div className="bg-white p-4 rounded-lg shadow mb-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Balance History</h2>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="balance" stroke="#8884d8" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+          <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300">Total PnL</h3>
+          <p className={`text-3xl font-bold mt-2 ${stats.totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            ${stats.totalPnL.toLocaleString()}
+          </p>
         </div>
 
-        {/* Challenge Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <ChallengeCard
-            challenge={{
-              platform: "FTMO",
-              accountId: "CH001",
-              type: "Express",
-              trades: 45,
-              daysPassed: 15,
-              daysLeft: 15,
-              status: "Active",
-              profitTarget: 10,
-              maxDrawdown: 5,
-              dailyLossLimit: 3,
-              currentProfit: 7.5,
-              currentDrawdown: 1.2,
-              dailyLossUsed: 0.8,
-              instruments: ["EURUSD", "GBPUSD", "USDJPY"],
-              averageTradeSize: 0.5,
-              winRate: "65%",
-              profitFactor: 2.1,
-              bestDay: 250,
-              worstDay: -150
-            }}
-          />
-          <ChallengeCard
-            challenge={{
-              platform: "FTMO",
-              accountId: "CH002",
-              type: "Normal",
-              trades: 120,
-              daysPassed: 30,
-              daysLeft: 0,
-              status: "Completed",
-              profitTarget: 10,
-              maxDrawdown: 5,
-              dailyLossLimit: 3,
-              currentProfit: 12.5,
-              currentDrawdown: 2.1,
-              dailyLossUsed: 1.5,
-              instruments: ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD"],
-              averageTradeSize: 0.3,
-              winRate: "72%",
-              profitFactor: 2.8,
-              bestDay: 350,
-              worstDay: -120
-            }}
-          />
-          <ChallengeCard
-            challenge={{
-              platform: "FTMO",
-              accountId: "CH003",
-              type: "Express",
-              trades: 65,
-              daysPassed: 20,
-              daysLeft: 0,
-              status: "Failed",
-              profitTarget: 10,
-              maxDrawdown: 5,
-              dailyLossLimit: 3,
-              currentProfit: 8.5,
-              currentDrawdown: 5.2,
-              dailyLossUsed: 3.0,
-              instruments: ["EURUSD", "GBPUSD"],
-              averageTradeSize: 0.4,
-              winRate: "58%",
-              profitFactor: 1.5,
-              bestDay: 280,
-              worstDay: -200
-            }}
-          />
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+          <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300">Percentage Gain</h3>
+          <p className={`text-3xl font-bold mt-2 ${stats.percentageGain >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            {stats.percentageGain.toFixed(2)}%
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h2 className="text-xl font-bold mb-4">Balance History</h2>
+        <div className="h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
+              <XAxis 
+                dataKey="date" 
+                stroke="rgba(255, 255, 255, 0.5)"
+                tick={{ fill: 'rgba(255, 255, 255, 0.5)' }}
+              />
+              <YAxis 
+                stroke="rgba(255, 255, 255, 0.5)"
+                tick={{ fill: 'rgba(255, 255, 255, 0.5)' }}
+                tickFormatter={(value) => `$${value.toLocaleString()}`}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  border: 'none',
+                  borderRadius: '4px',
+                  color: 'white'
+                }}
+                formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Balance']}
+              />
+              <Line
+                type="monotone"
+                dataKey="balance"
+                stroke="#10B981"
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
