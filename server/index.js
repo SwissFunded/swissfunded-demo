@@ -11,9 +11,17 @@ app.use(express.json());
 
 app.get('/api/forex-factory-news', async (req, res) => {
   try {
-    const response = await axios.get('https://www.forexfactory.com/calendar');
-    const $ = cheerio.load(response.data);
+    const response = await axios.get('https://www.forexfactory.com/calendar', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    });
+    
+    if (!response.data) {
+      throw new Error('No data received from Forex Factory');
+    }
 
+    const $ = cheerio.load(response.data);
     const events = [];
     
     // Find the calendar table
@@ -44,10 +52,24 @@ app.get('/api/forex-factory-news', async (req, res) => {
       });
     });
 
+    if (events.length === 0) {
+      console.error('No events found in the parsed data');
+      return res.status(500).json({ error: 'No events found in the response' });
+    }
+
     res.json(events);
   } catch (error) {
-    console.error('Error fetching Forex Factory data:', error);
-    res.status(500).json({ error: 'Failed to fetch news events' });
+    console.error('Error fetching Forex Factory data:', error.message);
+    console.error('Error details:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      headers: error.response?.headers,
+      data: error.response?.data
+    });
+    res.status(500).json({ 
+      error: 'Failed to fetch news events',
+      details: error.message
+    });
   }
 });
 
