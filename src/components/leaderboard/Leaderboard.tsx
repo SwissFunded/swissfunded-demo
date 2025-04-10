@@ -35,17 +35,6 @@ const successfulTraders = [
     favoritePairs: ['USD/CAD', 'NZD/USD'],
     image: 'https://randomuser.me/api/portraits/women/68.jpg',
     rank: 3
-  },
-  {
-    id: 4,
-    name: 'Sarah Chen',
-    profit: 98000,
-    winRate: 78.3,
-    profitFactor: 2.8,
-    strategy: 'Swing Trading',
-    favoritePairs: ['USD/JPY', 'AUD/USD'],
-    image: 'https://randomuser.me/api/portraits/women/44.jpg',
-    rank: 4
   }
 ];
 
