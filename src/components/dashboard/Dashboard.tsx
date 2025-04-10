@@ -50,6 +50,9 @@ const Dashboard: React.FC = () => {
         <div className="bg-background-light p-6 rounded-xl">
           <h3 className="text-lg font-medium text-text-muted mb-2">Total Trades</h3>
           <p className="text-2xl font-bold">{stats.totalTrades}</p>
+          <p className="text-sm text-text-muted mt-1">
+            {stats.wins} Wins / {stats.losses} Losses
+          </p>
         </div>
         <div className="bg-background-light p-6 rounded-xl">
           <h3 className="text-lg font-medium text-text-muted mb-2">Win Rate</h3>
