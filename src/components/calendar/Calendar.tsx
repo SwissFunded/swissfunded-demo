@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from '../../context/ThemeContext';
 
 interface NewsEvent {
   date: string;
@@ -18,6 +19,7 @@ const API_URL = 'https://swissfunded-demo-server.vercel.app/api/forex-news';
 const CACHE_DURATION = 5 * 60 * 1000;
 
 const Calendar: React.FC = () => {
+  const { isDarkMode } = useTheme();
   const [newsEvents, setNewsEvents] = useState<NewsEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -154,18 +156,18 @@ const Calendar: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] text-white p-6">
+    <div className={`min-h-screen ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} p-6`}>
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Forex News Calendar</h1>
+        <h1 className={`text-3xl font-bold mb-8 ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>Forex News Calendar</h1>
         
         {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Currency Pairs Filter */}
-          <div className="bg-[#2a2a2a] rounded-lg p-4 hover:bg-[#333333] transition-colors cursor-pointer" onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
-            <div className="text-sm text-gray-400 mb-1">Currency Pair</div>
-            <div className="text-xl font-semibold">{selectedCurrency || 'All Pairs'}</div>
+          <div className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} rounded-lg p-4 hover:${isDarkMode ? 'bg-background-lighter' : 'bg-background-lightMode-lighter'} transition-colors cursor-pointer`} onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>
+            <div className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-1`}>Currency Pair</div>
+            <div className={`text-xl font-semibold ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{selectedCurrency || 'All Pairs'}</div>
             {showCurrencyDropdown && (
-              <div className="absolute z-10 mt-2 w-48 bg-[#1a1a1a] border border-[#333333] rounded-md shadow-lg">
+              <div className={`absolute z-10 mt-2 w-48 ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-lighter' : 'border-background-lightMode-lighter'} rounded-md shadow-lg`}>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -175,7 +177,7 @@ const Calendar: React.FC = () => {
                   className={`w-full px-4 py-2 text-left text-sm ${
                     selectedCurrency === null
                       ? 'bg-primary text-white'
-                      : 'text-gray-300 hover:bg-[#333333]'
+                      : `${isDarkMode ? 'text-text-muted hover:bg-background-lighter' : 'text-text-lightMode-muted hover:bg-background-lightMode-lighter'}`
                   }`}
                 >
                   All Pairs
@@ -191,7 +193,7 @@ const Calendar: React.FC = () => {
                     className={`w-full px-4 py-2 text-left text-sm ${
                       selectedCurrency === currency
                         ? 'bg-primary text-white'
-                        : 'text-gray-300 hover:bg-[#333333]'
+                        : `${isDarkMode ? 'text-text-muted hover:bg-background-lighter' : 'text-text-lightMode-muted hover:bg-background-lightMode-lighter'}`
                     }`}
                   >
                     {currency}
@@ -202,11 +204,11 @@ const Calendar: React.FC = () => {
           </div>
 
           {/* Impact Filter */}
-          <div className="bg-[#2a2a2a] rounded-lg p-4 hover:bg-[#333333] transition-colors cursor-pointer" onClick={() => setShowImpactDropdown(!showImpactDropdown)}>
-            <div className="text-sm text-gray-400 mb-1">Impact</div>
-            <div className="text-xl font-semibold">{selectedImpact || 'All Impacts'}</div>
+          <div className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} rounded-lg p-4 hover:${isDarkMode ? 'bg-background-lighter' : 'bg-background-lightMode-lighter'} transition-colors cursor-pointer`} onClick={() => setShowImpactDropdown(!showImpactDropdown)}>
+            <div className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-1`}>Impact</div>
+            <div className={`text-xl font-semibold ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{selectedImpact || 'All Impacts'}</div>
             {showImpactDropdown && (
-              <div className="absolute z-10 mt-2 w-48 bg-[#1a1a1a] border border-[#333333] rounded-md shadow-lg">
+              <div className={`absolute z-10 mt-2 w-48 ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-lighter' : 'border-background-lightMode-lighter'} rounded-md shadow-lg`}>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -216,7 +218,7 @@ const Calendar: React.FC = () => {
                   className={`w-full px-4 py-2 text-left text-sm ${
                     selectedImpact === null
                       ? 'bg-primary text-white'
-                      : 'text-gray-300 hover:bg-[#333333]'
+                      : `${isDarkMode ? 'text-text-muted hover:bg-background-lighter' : 'text-text-lightMode-muted hover:bg-background-lightMode-lighter'}`
                   }`}
                 >
                   All Impacts
@@ -232,7 +234,7 @@ const Calendar: React.FC = () => {
                     className={`w-full px-4 py-2 text-left text-sm ${
                       selectedImpact === impact
                         ? 'bg-primary text-white'
-                        : 'text-gray-300 hover:bg-[#333333]'
+                        : `${isDarkMode ? 'text-text-muted hover:bg-background-lighter' : 'text-text-lightMode-muted hover:bg-background-lightMode-lighter'}`
                     }`}
                   >
                     {impact}
@@ -243,11 +245,11 @@ const Calendar: React.FC = () => {
           </div>
 
           {/* Event Type Filter */}
-          <div className="bg-[#2a2a2a] rounded-lg p-4 hover:bg-[#333333] transition-colors cursor-pointer" onClick={() => setShowEventDropdown(!showEventDropdown)}>
-            <div className="text-sm text-gray-400 mb-1">Event Type</div>
-            <div className="text-xl font-semibold">{selectedEvent || 'All Events'}</div>
+          <div className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} rounded-lg p-4 hover:${isDarkMode ? 'bg-background-lighter' : 'bg-background-lightMode-lighter'} transition-colors cursor-pointer`} onClick={() => setShowEventDropdown(!showEventDropdown)}>
+            <div className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-1`}>Event Type</div>
+            <div className={`text-xl font-semibold ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{selectedEvent || 'All Events'}</div>
             {showEventDropdown && (
-              <div className="absolute z-10 mt-2 w-48 bg-[#1a1a1a] border border-[#333333] rounded-md shadow-lg">
+              <div className={`absolute z-10 mt-2 w-48 ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-lighter' : 'border-background-lightMode-lighter'} rounded-md shadow-lg`}>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -257,7 +259,7 @@ const Calendar: React.FC = () => {
                   className={`w-full px-4 py-2 text-left text-sm ${
                     selectedEvent === null
                       ? 'bg-primary text-white'
-                      : 'text-gray-300 hover:bg-[#333333]'
+                      : `${isDarkMode ? 'text-text-muted hover:bg-background-lighter' : 'text-text-lightMode-muted hover:bg-background-lightMode-lighter'}`
                   }`}
                 >
                   All Events
@@ -273,7 +275,7 @@ const Calendar: React.FC = () => {
                     className={`w-full px-4 py-2 text-left text-sm ${
                       selectedEvent === event
                         ? 'bg-primary text-white'
-                        : 'text-gray-300 hover:bg-[#333333]'
+                        : `${isDarkMode ? 'text-text-muted hover:bg-background-lighter' : 'text-text-lightMode-muted hover:bg-background-lightMode-lighter'}`
                     }`}
                   >
                     {event}
@@ -284,59 +286,59 @@ const Calendar: React.FC = () => {
           </div>
 
           {/* Date Range Filter */}
-          <div className="bg-[#2a2a2a] rounded-lg p-4">
-            <div className="text-sm text-gray-400 mb-1">Date Range</div>
+          <div className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} rounded-lg p-4`}>
+            <div className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-1`}>Date Range</div>
             <div className="flex gap-2">
               <input
                 type="date"
                 value={dateRange.start}
                 onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                className="w-full px-3 py-1.5 rounded-md bg-[#1a1a1a] border border-[#333333] text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                className={`w-full px-3 py-1.5 rounded-md ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-lighter' : 'border-background-lightMode-lighter'} ${isDarkMode ? 'text-text' : 'text-text-lightMode'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent`}
               />
               <input
                 type="date"
                 value={dateRange.end}
                 onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                className="w-full px-3 py-1.5 rounded-md bg-[#1a1a1a] border border-[#333333] text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                className={`w-full px-3 py-1.5 rounded-md ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-lighter' : 'border-background-lightMode-lighter'} ${isDarkMode ? 'text-text' : 'text-text-lightMode'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent`}
               />
             </div>
           </div>
         </div>
 
         {/* Calendar Table */}
-        <div className="overflow-x-auto bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg">
+        <div className={`overflow-x-auto ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-light' : 'border-background-lightMode-light'} rounded-lg`}>
           <table className="min-w-full divide-y divide-[#2a2a2a]">
-            <thead className="bg-[#2a2a2a]">
+            <thead className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'}`}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Time</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Currency</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Impact</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Event</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Forecast</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#cccccc] uppercase tracking-wider">Previous</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} uppercase tracking-wider`}>Date</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} uppercase tracking-wider`}>Time</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} uppercase tracking-wider`}>Currency</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} uppercase tracking-wider`}>Impact</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} uppercase tracking-wider`}>Event</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} uppercase tracking-wider`}>Forecast</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} uppercase tracking-wider`}>Previous</th>
               </tr>
             </thead>
-            <tbody className="bg-[#1a1a1a] divide-y divide-[#2a2a2a]">
+            <tbody className={`${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} divide-y ${isDarkMode ? 'divide-background-light' : 'divide-background-lightMode-light'}`}>
               {filteredEvents.map((event, index) => (
                 <motion.tr
                   key={`${event.date}-${event.time}-${index}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="hover:bg-[#2a2a2a]"
+                  className={`hover:${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'}`}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.date}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.time}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{event.currency}</td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{event.date}</td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{event.time}</td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{event.currency}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getImpactColor(event.impact)}`}>
                       {event.impact}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.event}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.forecast}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{event.previous}</td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{event.event}</td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{event.forecast}</td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{event.previous}</td>
                 </motion.tr>
               ))}
             </tbody>
