@@ -80,11 +80,11 @@ const Map: React.FC = () => {
     return scaleLinear<string>()
       .domain([20, 50, 100, 150, 200])
       .range([
-        isDarkMode ? "rgba(255, 51, 75, 0.1)" : "rgba(255, 51, 75, 0.05)",
-        isDarkMode ? "rgba(255, 51, 75, 0.15)" : "rgba(255, 51, 75, 0.1)",
-        isDarkMode ? "rgba(255, 51, 75, 0.2)" : "rgba(255, 51, 75, 0.15)",
-        isDarkMode ? "rgba(255, 51, 75, 0.25)" : "rgba(255, 51, 75, 0.2)",
-        isDarkMode ? "rgba(255, 51, 75, 0.3)" : "rgba(255, 51, 75, 0.25)"
+        isDarkMode ? "rgba(255, 51, 75, 0.05)" : "rgba(255, 51, 75, 0.05)",
+        isDarkMode ? "rgba(255, 51, 75, 0.1)" : "rgba(255, 51, 75, 0.1)",
+        isDarkMode ? "rgba(255, 51, 75, 0.15)" : "rgba(255, 51, 75, 0.15)",
+        isDarkMode ? "rgba(255, 51, 75, 0.2)" : "rgba(255, 51, 75, 0.2)",
+        isDarkMode ? "rgba(255, 51, 75, 0.25)" : "rgba(255, 51, 75, 0.25)"
       ]);
   }, [isDarkMode]);
 
@@ -93,11 +93,7 @@ const Map: React.FC = () => {
     if (country && (!selectedRegion || country.region === selectedRegion)) {
       return colorScale(country.users);
     }
-    // Debug logging
-    if (geo.properties?.name?.includes('United States')) {
-      console.log('Found US in GeoJSON:', geo.properties.name);
-    }
-    return isDarkMode ? "#333333" : "#e5e5e5";
+    return isDarkMode ? "#1a1a1a" : "#f5f5f5";
   };
 
   const regions = Array.from(new Set(countries.map(c => c.region)));
@@ -168,7 +164,8 @@ const Map: React.FC = () => {
           }}
           style={{
             width: "100%",
-            height: "100%"
+            height: "100%",
+            background: isDarkMode ? "#1a1a1a" : "#f5f5f5"
           }}
         >
           <ZoomableGroup>
@@ -187,12 +184,12 @@ const Map: React.FC = () => {
                       key={geo.properties?.name || Math.random()}
                       geography={geo}
                       fill={getCountryColor(geo)}
-                      stroke={isDarkMode ? "#444444" : "#d1d1d1"}
+                      stroke={isDarkMode ? "#2a2a2a" : "#e5e5e5"}
                       strokeWidth={0.5}
                       style={{
                         default: { outline: "none" },
                         hover: { 
-                          fill: country ? colorScale(country.users + 20) : (isDarkMode ? "#444444" : "#d1d1d1"),
+                          fill: country ? colorScale(country.users + 20) : (isDarkMode ? "#2a2a2a" : "#e5e5e5"),
                           transition: "all 0.3s ease"
                         },
                         pressed: { outline: "none" },
