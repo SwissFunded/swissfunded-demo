@@ -4,7 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { UserCircleIcon, CameraIcon } from '@heroicons/react/24/outline';
 
 const Settings: React.FC = () => {
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [avatar, setAvatar] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -82,7 +82,7 @@ const Settings: React.FC = () => {
                   </p>
                 </div>
                 <button
-                  onClick={() => document.documentElement.classList.toggle('dark')}
+                  onClick={toggleTheme}
                   className={`px-4 py-2 rounded-lg ${
                     isDarkMode ? 'bg-primary text-white' : 'bg-background-lightMode-lighter text-text-lightMode'
                   }`}
