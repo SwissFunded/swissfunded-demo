@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { LazyMotion, domMax, m, AnimatePresence } from 'framer-motion';
+import { MotionConfig, m } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
 import { GlobeAltIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import {
@@ -101,7 +101,7 @@ const Map: React.FC = () => {
   const regions = Array.from(new Set(countries.map(c => c.region)));
 
   return (
-    <LazyMotion features={domMax}>
+    <MotionConfig reducedMotion="user">
       <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -243,24 +243,23 @@ const Map: React.FC = () => {
           </ComposableMap>
 
           {/* Enhanced Tooltip */}
-          <AnimatePresence mode="wait">
-            {tooltipContent && tooltipPosition && (
-              <m.div
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 5 }}
-                className={`absolute px-4 py-2.5 rounded-lg ${
-                  isDarkMode ? 'bg-background-light text-text' : 'bg-background-lightMode-light text-text-lightMode'
-                } shadow-xl pointer-events-none z-50 backdrop-blur-sm`}
-                style={{
-                  left: tooltipPosition.x,
-                  top: tooltipPosition.y - 50,
-                }}
-              >
-                {tooltipContent}
-              </m.div>
-            )}
-          </AnimatePresence>
+          {tooltipContent && tooltipPosition && (
+            <m.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.2 }}
+              className={`absolute px-4 py-2.5 rounded-lg ${
+                isDarkMode ? 'bg-background-light text-text' : 'bg-background-lightMode-light text-text-lightMode'
+              } shadow-xl pointer-events-none z-50 backdrop-blur-sm`}
+              style={{
+                left: tooltipPosition.x,
+                top: tooltipPosition.y - 50,
+              }}
+            >
+              {tooltipContent}
+            </m.div>
+          )}
         </div>
 
         {/* Modern Legend */}
@@ -289,7 +288,7 @@ const Map: React.FC = () => {
           </div>
         </div>
       </m.div>
-    </LazyMotion>
+    </MotionConfig>
   );
 };
 
