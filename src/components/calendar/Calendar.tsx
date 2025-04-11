@@ -70,31 +70,52 @@ const Calendar: React.FC = () => {
 
   // Quick filter handlers
   const handleTodayFilter = () => {
-    const today = new Date().toISOString().split('T')[0];
-    setDateRange({ start: today, end: today });
-    setShowToday(true);
-    setShowUpcoming(false);
-    setShowHighImpact(false);
+    if (showToday) {
+      // If already active, clear the filter
+      setDateRange({ start: '', end: '' });
+      setShowToday(false);
+    } else {
+      // If not active, apply the filter
+      const today = new Date().toISOString().split('T')[0];
+      setDateRange({ start: today, end: today });
+      setShowToday(true);
+      setShowUpcoming(false);
+      setShowHighImpact(false);
+    }
   };
 
   const handleUpcomingFilter = () => {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    setDateRange({
-      start: today.toISOString().split('T')[0],
-      end: tomorrow.toISOString().split('T')[0]
-    });
-    setShowUpcoming(true);
-    setShowToday(false);
-    setShowHighImpact(false);
+    if (showUpcoming) {
+      // If already active, clear the filter
+      setDateRange({ start: '', end: '' });
+      setShowUpcoming(false);
+    } else {
+      // If not active, apply the filter
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      setDateRange({
+        start: today.toISOString().split('T')[0],
+        end: tomorrow.toISOString().split('T')[0]
+      });
+      setShowUpcoming(true);
+      setShowToday(false);
+      setShowHighImpact(false);
+    }
   };
 
   const handleHighImpactFilter = () => {
-    setSelectedImpact('high');
-    setShowHighImpact(true);
-    setShowToday(false);
-    setShowUpcoming(false);
+    if (showHighImpact) {
+      // If already active, clear the filter
+      setSelectedImpact(null);
+      setShowHighImpact(false);
+    } else {
+      // If not active, apply the filter
+      setSelectedImpact('high');
+      setShowHighImpact(true);
+      setShowToday(false);
+      setShowUpcoming(false);
+    }
   };
 
   // Filter events based on selected filters
