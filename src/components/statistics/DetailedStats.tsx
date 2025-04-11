@@ -221,8 +221,8 @@ const DetailedStats: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-background-light rounded-xl p-6">
-          <h3 className="text-xl font-heading mb-4">Trading Statistics</h3>
+        <div className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} rounded-xl p-6`}>
+          <h3 className={`text-xl font-heading mb-4 ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>Trading Statistics</h3>
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
