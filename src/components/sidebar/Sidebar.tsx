@@ -9,6 +9,7 @@ import {
   Cog6ToothIcon,
   ChatBubbleLeftRightIcon,
   AcademicCapIcon,
+  ArrowTopRightOnSquareIcon,
 } from '@heroicons/react/24/outline';
 import Logo from '../Logo';
 
@@ -68,8 +69,17 @@ const Sidebar: React.FC = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.4 }}
-          className="p-4 border-t border-white/[0.02]"
+          className="p-4 border-t border-white/[0.02] space-y-2"
         >
+          <a 
+            href="https://swissfunded.eu" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="sidebar-item w-full justify-center group"
+          >
+            <ArrowTopRightOnSquareIcon className="h-6 w-6 group-hover:text-primary transition-colors" />
+            <span>Visit SwissFunded</span>
+          </a>
           <button className="sidebar-item w-full justify-center group">
             <ChatBubbleLeftRightIcon className="h-6 w-6 group-hover:text-primary transition-colors" />
             <span>Support Chat</span>
