@@ -80,11 +80,11 @@ const Map: React.FC = () => {
     return scaleLinear<string>()
       .domain([20, 50, 100, 150, 200])
       .range([
-        isDarkMode ? "rgba(99, 102, 241, 0.1)" : "rgba(99, 102, 241, 0.05)",
-        isDarkMode ? "rgba(99, 102, 241, 0.2)" : "rgba(99, 102, 241, 0.15)",
-        isDarkMode ? "rgba(99, 102, 241, 0.3)" : "rgba(99, 102, 241, 0.25)",
-        isDarkMode ? "rgba(99, 102, 241, 0.4)" : "rgba(99, 102, 241, 0.35)",
-        isDarkMode ? "rgba(99, 102, 241, 0.5)" : "rgba(99, 102, 241, 0.45)"
+        isDarkMode ? "rgba(255, 51, 75, 0.1)" : "rgba(255, 51, 75, 0.05)",
+        isDarkMode ? "rgba(255, 51, 75, 0.15)" : "rgba(255, 51, 75, 0.1)",
+        isDarkMode ? "rgba(255, 51, 75, 0.2)" : "rgba(255, 51, 75, 0.15)",
+        isDarkMode ? "rgba(255, 51, 75, 0.25)" : "rgba(255, 51, 75, 0.2)",
+        isDarkMode ? "rgba(255, 51, 75, 0.3)" : "rgba(255, 51, 75, 0.25)"
       ]);
   }, [isDarkMode]);
 
@@ -236,24 +236,24 @@ const Map: React.FC = () => {
       <div className={`mt-6 p-4 rounded-lg ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'}`}>
         <div className="flex items-center gap-6 text-sm">
           <div className="flex items-center gap-1">
-            <div className="w-12 h-3 rounded bg-red-500 opacity-20"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'< 100 users'}</span>
+            <div className="w-12 h-3 rounded bg-primary opacity-10"></div>
+            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'< 50 users'}</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-12 h-3 rounded bg-red-500 opacity-40"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>100-200 users</span>
+            <div className="w-12 h-3 rounded bg-primary opacity-15"></div>
+            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>50-100 users</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-12 h-3 rounded bg-red-500 opacity-60"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>200-300 users</span>
+            <div className="w-12 h-3 rounded bg-primary opacity-20"></div>
+            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>100-150 users</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-12 h-3 rounded bg-red-500 opacity-80"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>300-400 users</span>
+            <div className="w-12 h-3 rounded bg-primary opacity-25"></div>
+            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>150-200 users</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-12 h-3 rounded bg-red-500 opacity-90"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'>400 users'}</span>
+            <div className="w-12 h-3 rounded bg-primary opacity-30"></div>
+            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'>200 users'}</span>
           </div>
         </div>
       </div>
