@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { GlobeAltIcon } from '@heroicons/react/24/outline';
 import {
@@ -21,6 +21,7 @@ interface CountryData {
 
 const Map: React.FC = () => {
   const { isDarkMode } = useTheme();
+  const mapRef = useRef<HTMLDivElement>(null);
   const [countries, setCountries] = useState<CountryData[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [tooltipContent, setTooltipContent] = useState<string>('');
@@ -141,9 +142,12 @@ const Map: React.FC = () => {
       </div>
 
       {/* Map */}
-      <div className={`relative w-full h-[600px] rounded-xl overflow-hidden ${
-        isDarkMode ? 'bg-background' : 'bg-background-lightMode'
-      } shadow-inner`}>
+      <div 
+        ref={mapRef}
+        className={`relative w-full h-[600px] rounded-xl overflow-hidden ${
+          isDarkMode ? 'bg-background' : 'bg-background-lightMode'
+        } shadow-inner`}
+      >
         <ComposableMap
           projection="geoMercator"
           projectionConfig={{
@@ -186,10 +190,14 @@ const Map: React.FC = () => {
                         pressed: { outline: "none" },
                       }}
                       onMouseEnter={(e) => {
-                        if (country) {
+                        if (country && mapRef.current) {
                           const bounds = (e.target as SVGElement).getBoundingClientRect();
+                          const mapBounds = mapRef.current.getBoundingClientRect();
                           setTooltipContent(`${country.name}: ${country.users.toLocaleString()} users`);
-                          setTooltipPosition({ x: bounds.left, y: bounds.top });
+                          setTooltipPosition({
+                            x: bounds.left - mapBounds.left + bounds.width / 2,
+                            y: bounds.top - mapBounds.top
+                          });
                         }
                       }}
                       onMouseLeave={() => {
@@ -209,10 +217,10 @@ const Map: React.FC = () => {
           <div
             className={`absolute px-4 py-2.5 rounded-lg ${
               isDarkMode ? 'bg-background-light text-text' : 'bg-background-lightMode-light text-text-lightMode'
-            } shadow-xl pointer-events-none z-50 backdrop-blur-sm`}
+            } shadow-xl pointer-events-none z-50 backdrop-blur-sm transform -translate-x-1/2`}
             style={{
               left: tooltipPosition.x,
-              top: tooltipPosition.y - 50,
+              top: Math.max(0, tooltipPosition.y - 60),
             }}
           >
             {tooltipContent}
