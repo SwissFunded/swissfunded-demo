@@ -10,11 +10,15 @@ import {
   ChatBubbleLeftRightIcon,
   AcademicCapIcon,
   ArrowTopRightOnSquareIcon,
+  SunIcon,
+  MoonIcon,
 } from '@heroicons/react/24/outline';
 import Logo from '../Logo';
+import { useTheme } from '../../context/ThemeContext';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   const navItems = [
     { path: '/', icon: HomeIcon, label: 'Home' },
@@ -71,6 +75,17 @@ const Sidebar: React.FC = () => {
           transition={{ duration: 0.3, delay: 0.4 }}
           className="p-4 border-t border-white/[0.02] space-y-2"
         >
+          <button 
+            onClick={toggleTheme}
+            className="sidebar-item w-full justify-center group"
+          >
+            {isDarkMode ? (
+              <SunIcon className="h-6 w-6 group-hover:text-primary transition-colors" />
+            ) : (
+              <MoonIcon className="h-6 w-6 group-hover:text-primary transition-colors" />
+            )}
+            <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+          </button>
           <a 
             href="https://swissfunded.eu" 
             target="_blank" 
