@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
+import {
+  CalendarDaysIcon,
+  ClockIcon,
+  BoltIcon,
+  ChevronRightIcon,
+} from '@heroicons/react/24/outline';
 
 interface NewsEvent {
   date: string;
@@ -36,6 +42,11 @@ const Calendar: React.FC = () => {
     end: ''
   });
 
+  // Quick filter states
+  const [showUpcoming, setShowUpcoming] = useState(false);
+  const [showHighImpact, setShowHighImpact] = useState(false);
+  const [showToday, setShowToday] = useState(false);
+
   // Dropdown states
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [showImpactDropdown, setShowImpactDropdown] = useState(false);
@@ -57,18 +68,45 @@ const Calendar: React.FC = () => {
     [newsEvents]
   );
 
+  // Quick filter handlers
+  const handleTodayFilter = () => {
+    const today = new Date().toISOString().split('T')[0];
+    setDateRange({ start: today, end: today });
+    setShowToday(true);
+    setShowUpcoming(false);
+    setShowHighImpact(false);
+  };
+
+  const handleUpcomingFilter = () => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setDateRange({
+      start: today.toISOString().split('T')[0],
+      end: tomorrow.toISOString().split('T')[0]
+    });
+    setShowUpcoming(true);
+    setShowToday(false);
+    setShowHighImpact(false);
+  };
+
+  const handleHighImpactFilter = () => {
+    setSelectedImpact('high');
+    setShowHighImpact(true);
+    setShowToday(false);
+    setShowUpcoming(false);
+  };
+
   // Filter events based on selected filters
   const filteredEvents = useMemo(() => {
     return newsEvents.filter(event => {
-      const matchesCurrency = selectedCurrency === null || event.currency === selectedCurrency;
-      const matchesImpact = selectedImpact === null || event.impact === selectedImpact;
-      const matchesEvent = selectedEvent === null || event.event === selectedEvent;
-      const eventDate = new Date(event.date);
-      const startDate = new Date(dateRange.start);
-      const endDate = new Date(dateRange.end);
-      const matchesDate = (!dateRange.start || eventDate >= startDate) && 
-                         (!dateRange.end || eventDate <= endDate);
-      return matchesCurrency && matchesImpact && matchesEvent && matchesDate;
+      const matchesCurrency = !selectedCurrency || event.currency === selectedCurrency;
+      const matchesImpact = !selectedImpact || event.impact.toLowerCase() === selectedImpact.toLowerCase();
+      const matchesEvent = !selectedEvent || event.event === selectedEvent;
+      const matchesDateRange = !dateRange.start || !dateRange.end || 
+        (event.date >= dateRange.start && event.date <= dateRange.end);
+
+      return matchesCurrency && matchesImpact && matchesEvent && matchesDateRange;
     });
   }, [newsEvents, selectedCurrency, selectedImpact, selectedEvent, dateRange]);
 
@@ -160,6 +198,53 @@ const Calendar: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <h1 className={`text-3xl font-bold mb-8 ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>Forex News Calendar</h1>
         
+        {/* Quick Filters */}
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-3">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleTodayFilter}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                showToday
+                  ? 'bg-primary text-white'
+                  : `${isDarkMode ? 'bg-background-light hover:bg-background-lighter' : 'bg-background-lightMode-light hover:bg-background-lightMode-lighter'} ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`
+              } transition-all duration-200`}
+            >
+              <CalendarDaysIcon className="h-5 w-5" />
+              Today's Events
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleUpcomingFilter}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                showUpcoming
+                  ? 'bg-primary text-white'
+                  : `${isDarkMode ? 'bg-background-light hover:bg-background-lighter' : 'bg-background-lightMode-light hover:bg-background-lightMode-lighter'} ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`
+              } transition-all duration-200`}
+            >
+              <ClockIcon className="h-5 w-5" />
+              Next 24 Hours
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleHighImpactFilter}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                showHighImpact
+                  ? 'bg-primary text-white'
+                  : `${isDarkMode ? 'bg-background-light hover:bg-background-lighter' : 'bg-background-lightMode-light hover:bg-background-lightMode-lighter'} ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`
+              } transition-all duration-200`}
+            >
+              <BoltIcon className="h-5 w-5" />
+              High Impact Only
+            </motion.button>
+          </div>
+        </div>
+
         {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Currency Pairs Filter */}
@@ -309,8 +394,8 @@ const Calendar: React.FC = () => {
           </div>
         </div>
 
-        {/* Calendar Table */}
-        <div className={`overflow-x-auto ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-light' : 'border-background-lightMode-light'} rounded-lg`}>
+        {/* Calendar Table with Visual Enhancements */}
+        <div className={`overflow-x-auto ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-light' : 'border-background-lightMode-light'} rounded-lg shadow-lg`}>
           <table className="min-w-full divide-y divide-[#2a2a2a]">
             <thead className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'}`}>
               <tr>
@@ -330,9 +415,14 @@ const Calendar: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className={`hover:${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'}`}
+                  className={`group hover:${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} transition-colors duration-200`}
                 >
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{event.date}</td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>
+                    <div className="flex items-center gap-2">
+                      <ChevronRightIcon className={`h-4 w-4 ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} group-hover:text-primary transition-colors`} />
+                      {event.date}
+                    </div>
+                  </td>
                   <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{event.time}</td>
                   <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{event.currency}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
