@@ -8,6 +8,7 @@ import Tutorials from './components/tutorials/Tutorials';
 import Calendar from './components/calendar/Calendar';
 import Leaderboard from './components/leaderboard/Leaderboard';
 import Logo from './components/Logo';
+import { ThemeProvider } from './context/ThemeContext';
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -47,7 +48,9 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Router>
-      <AppContent />
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
     </Router>
   );
 };
