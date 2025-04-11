@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domMax, m, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
 import { GlobeAltIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import {
@@ -101,7 +101,7 @@ const Map: React.FC = () => {
   const regions = Array.from(new Set(countries.map(c => c.region)));
 
   return (
-    <LazyMotion features={domAnimation}>
+    <LazyMotion features={domMax}>
       <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -243,7 +243,7 @@ const Map: React.FC = () => {
           </ComposableMap>
 
           {/* Enhanced Tooltip */}
-          <AnimatePresence>
+          <AnimatePresence mode="wait">
             {tooltipContent && tooltipPosition && (
               <m.div
                 initial={{ opacity: 0, y: 5 }}
