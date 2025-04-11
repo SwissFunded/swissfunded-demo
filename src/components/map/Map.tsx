@@ -100,11 +100,17 @@ const Map: React.FC = () => {
       </div>
 
       {/* Map */}
-      <div className={`relative w-full h-[600px] rounded-lg overflow-hidden ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'}`}>
+      <div className={`relative w-full h-[600px] rounded-lg overflow-hidden border ${
+        isDarkMode ? 'bg-background border-background-lighter' : 'bg-background-lightMode border-background-lightMode-lighter'
+      }`}>
         <ComposableMap
           projection="geoMercator"
           projectionConfig={{
             scale: 150
+          }}
+          style={{
+            width: "100%",
+            height: "100%"
           }}
         >
           <ZoomableGroup center={[0, 20]} zoom={1}>
@@ -114,12 +120,15 @@ const Map: React.FC = () => {
                   <Geography
                     key={geo.properties?.name || Math.random()}
                     geography={geo}
-                    fill={isDarkMode ? "#2a2a2a" : "#f0f0f0"}
-                    stroke={isDarkMode ? "#1a1a1a" : "#e5e5e5"}
-                    strokeWidth={0.5}
+                    fill={isDarkMode ? "#333333" : "#e5e5e5"}
+                    stroke={isDarkMode ? "#444444" : "#d1d1d1"}
+                    strokeWidth={0.75}
                     style={{
                       default: { outline: "none" },
-                      hover: { outline: "none" },
+                      hover: { 
+                        fill: isDarkMode ? "#444444" : "#d1d1d1",
+                        transition: "all 0.3s ease"
+                      },
                       pressed: { outline: "none" },
                     }}
                   />
@@ -143,12 +152,13 @@ const Map: React.FC = () => {
                   }}
                 >
                   <circle
-                    r={Math.max(4, Math.min(users / 10, 8))}
+                    r={Math.max(5, Math.min(users / 8, 10))}
                     fill={colorScale(users)}
-                    stroke={isDarkMode ? "#1a1a1a" : "#e5e5e5"}
-                    strokeWidth={1}
+                    stroke={isDarkMode ? "#ffffff" : "#000000"}
+                    strokeWidth={1.5}
                     style={{
                       transition: "all 0.3s ease",
+                      cursor: "pointer"
                     }}
                   />
                 </Marker>
