@@ -34,7 +34,7 @@ const Sidebar: React.FC = () => {
       initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className={`fixed inset-y-0 left-0 w-64 ${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} border-r ${isDarkMode ? 'border-white/[0.02]' : 'border-gray-200'} mt-[72px]`}
+      className={`fixed inset-y-0 left-0 w-64 ${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} border-r ${isDarkMode ? 'border-white/[0.02]' : 'border-gray-200'} mt-[72px] rounded-tr-2xl`}
     >
       <div className="flex flex-col h-full">
         <motion.div 
