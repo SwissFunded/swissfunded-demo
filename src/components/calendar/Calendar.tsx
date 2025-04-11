@@ -287,14 +287,14 @@ const Calendar: React.FC = () => {
 
           {/* Date Range Filter */}
           <div className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} rounded-lg p-4`}>
-            <div className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-1`}>Date Range</div>
+            <div className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-2`}>Date Range</div>
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="flex-1">
                 <input
                   type="date"
                   value={dateRange.start}
                   onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                  className={`w-full px-2 py-1.5 text-sm rounded-md ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-lighter' : 'border-background-lightMode-lighter'} ${isDarkMode ? 'text-text' : 'text-text-lightMode'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent`}
+                  className={`w-full h-8 px-2 text-xs rounded-md ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-lighter' : 'border-background-lightMode-lighter'} ${isDarkMode ? 'text-text' : 'text-text-lightMode'} focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent`}
                 />
               </div>
               <div className="flex-1">
@@ -302,7 +302,7 @@ const Calendar: React.FC = () => {
                   type="date"
                   value={dateRange.end}
                   onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                  className={`w-full px-2 py-1.5 text-sm rounded-md ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-lighter' : 'border-background-lightMode-lighter'} ${isDarkMode ? 'text-text' : 'text-text-lightMode'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent`}
+                  className={`w-full h-8 px-2 text-xs rounded-md ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} border ${isDarkMode ? 'border-background-lighter' : 'border-background-lightMode-lighter'} ${isDarkMode ? 'text-text' : 'text-text-lightMode'} focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent`}
                 />
               </div>
             </div>
