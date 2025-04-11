@@ -191,12 +191,20 @@ const Map: React.FC = () => {
                       }}
                       onMouseEnter={(e) => {
                         if (country && mapRef.current) {
-                          const bounds = (e.target as SVGElement).getBoundingClientRect();
                           const mapBounds = mapRef.current.getBoundingClientRect();
                           setTooltipContent(`${country.name}: ${country.users.toLocaleString()} users`);
                           setTooltipPosition({
-                            x: bounds.left - mapBounds.left + bounds.width / 2,
-                            y: bounds.top - mapBounds.top
+                            x: e.clientX - mapBounds.left,
+                            y: e.clientY - mapBounds.top
+                          });
+                        }
+                      }}
+                      onMouseMove={(e) => {
+                        if (country && mapRef.current) {
+                          const mapBounds = mapRef.current.getBoundingClientRect();
+                          setTooltipPosition({
+                            x: e.clientX - mapBounds.left,
+                            y: e.clientY - mapBounds.top
                           });
                         }
                       }}
@@ -220,7 +228,7 @@ const Map: React.FC = () => {
             } shadow-xl pointer-events-none z-50 backdrop-blur-sm transform -translate-x-1/2`}
             style={{
               left: tooltipPosition.x,
-              top: Math.max(0, tooltipPosition.y - 60),
+              top: Math.max(10, tooltipPosition.y - 40),
             }}
           >
             {tooltipContent}
