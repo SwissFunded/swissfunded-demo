@@ -34,7 +34,7 @@ const Sidebar: React.FC = () => {
       initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="fixed inset-y-0 left-0 w-64 bg-background-light border-r border-white/[0.02] mt-[72px]"
+      className={`fixed inset-y-0 left-0 w-64 ${isDarkMode ? 'bg-background-light border-white/[0.02]' : 'bg-background-lightMode-light border-gray-200'} border-r mt-[72px]`}
     >
       <div className="flex flex-col h-full">
         <motion.div 
@@ -45,8 +45,8 @@ const Sidebar: React.FC = () => {
         >
           <Logo className="h-8" />
           <div>
-            <h2 className="text-lg font-heading font-bold text-text">SwissFunded</h2>
-            <p className="text-text-muted text-sm">Trading Dashboard</p>
+            <h2 className={`text-lg font-heading font-bold ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>SwissFunded</h2>
+            <p className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`}>Trading Dashboard</p>
           </div>
         </motion.div>
 
@@ -60,9 +60,9 @@ const Sidebar: React.FC = () => {
             >
               <Link 
                 to={item.path} 
-                className={`sidebar-item group ${location.pathname === item.path ? 'active' : ''}`}
+                className={`sidebar-item group ${location.pathname === item.path ? 'active' : ''} ${isDarkMode ? 'text-text-muted hover:text-text' : 'text-text-lightMode-muted hover:text-text-lightMode'}`}
               >
-                <item.icon className="h-6 w-6 transition-colors group-hover:text-primary" />
+                <item.icon className={`h-6 w-6 transition-colors group-hover:text-primary ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`} />
                 <span>{item.label}</span>
               </Link>
             </motion.div>
@@ -73,11 +73,11 @@ const Sidebar: React.FC = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.4 }}
-          className="p-4 border-t border-white/[0.02] space-y-2"
+          className={`p-4 border-t ${isDarkMode ? 'border-white/[0.02]' : 'border-gray-200'} space-y-2`}
         >
           <button 
             onClick={toggleTheme}
-            className="sidebar-item w-full justify-center group"
+            className={`sidebar-item w-full justify-center group ${isDarkMode ? 'text-text-muted hover:text-text' : 'text-text-lightMode-muted hover:text-text-lightMode'}`}
           >
             {isDarkMode ? (
               <SunIcon className="h-6 w-6 group-hover:text-primary transition-colors" />
@@ -90,12 +90,12 @@ const Sidebar: React.FC = () => {
             href="https://swissfunded.eu" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="sidebar-item w-full justify-center group"
+            className={`sidebar-item w-full justify-center group ${isDarkMode ? 'text-text-muted hover:text-text' : 'text-text-lightMode-muted hover:text-text-lightMode'}`}
           >
             <ArrowTopRightOnSquareIcon className="h-6 w-6 group-hover:text-primary transition-colors" />
             <span>Visit SwissFunded</span>
           </a>
-          <button className="sidebar-item w-full justify-center group">
+          <button className={`sidebar-item w-full justify-center group ${isDarkMode ? 'text-text-muted hover:text-text' : 'text-text-lightMode-muted hover:text-text-lightMode'}`}>
             <ChatBubbleLeftRightIcon className="h-6 w-6 group-hover:text-primary transition-colors" />
             <span>Support Chat</span>
           </button>

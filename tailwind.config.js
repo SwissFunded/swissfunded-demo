@@ -4,6 +4,7 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -16,10 +17,19 @@ module.exports = {
           DEFAULT: '#0a0a0a',
           light: '#1a1a1a',
           lighter: '#2a2a2a',
+          lightMode: {
+            DEFAULT: '#ffffff',
+            light: '#f3f4f6',
+            lighter: '#e5e7eb',
+          }
         },
         text: {
           DEFAULT: '#ffffff',
           muted: '#cccccc',
+          lightMode: {
+            DEFAULT: '#1f2937',
+            muted: '#6b7280',
+          }
         },
         accent: {
           red: '#DC2626',
