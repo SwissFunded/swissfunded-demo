@@ -1,61 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
-import WorldMap from '@svg-maps/world';
-import { SVGMap } from 'react-svg-map';
-import 'react-svg-map/lib/index.css';
-
-interface SignupData {
-  country: string;
-  count: number;
-  id: string;
-}
-
-interface Location {
-  id: string;
-  path: string;
-  name: string;
-}
-
-interface MapEvent extends React.MouseEvent<SVGElement> {
-  target: SVGElement & { id: string };
-}
 
 const Map: React.FC = () => {
   const { isDarkMode } = useTheme();
-  const [signupData, setSignupData] = useState<SignupData[]>([]);
-  const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
+  const [signupData, setSignupData] = useState<Record<string, number>>({});
 
   // Generate random signup data
   useEffect(() => {
-    const countries = [
-      { country: 'United States', id: 'usa' },
-      { country: 'United Kingdom', id: 'gbr' },
-      { country: 'Germany', id: 'deu' },
-      { country: 'Japan', id: 'jpn' },
-      { country: 'Australia', id: 'aus' },
-      { country: 'Canada', id: 'can' },
-      { country: 'Switzerland', id: 'che' },
-      { country: 'Singapore', id: 'sgp' },
-      { country: 'France', id: 'fra' },
-      { country: 'Spain', id: 'esp' }
-    ];
+    const countries = {
+      US: 'United States',
+      GB: 'United Kingdom',
+      DE: 'Germany',
+      JP: 'Japan',
+      AU: 'Australia',
+      CA: 'Canada',
+      CH: 'Switzerland',
+      SG: 'Singapore',
+      FR: 'France',
+      ES: 'Spain'
+    };
 
-    const randomData = countries.map(country => ({
-      ...country,
-      count: Math.floor(Math.random() * 100) + 20 // Random number between 20-120
-    }));
+    const randomData: Record<string, number> = {};
+    Object.keys(countries).forEach(code => {
+      randomData[code] = Math.floor(Math.random() * 100) + 20; // Random number between 20-120
+    });
 
     setSignupData(randomData);
   }, []);
-
-  const getCountryColor = (countryId: string) => {
-    const country = signupData.find(data => data.id === countryId);
-    if (!country) return isDarkMode ? '#2a2a2a' : '#f0f0f0';
-    
-    const opacity = Math.min(0.2 + (country.count / 120) * 0.8, 1);
-    return `rgba(239, 68, 68, ${opacity})`; // Using red (primary color) with varying opacity
-  };
 
   return (
     <motion.div
@@ -69,21 +41,13 @@ const Map: React.FC = () => {
       </h2>
       
       <div className="relative">
-        <SVGMap
-          map={WorldMap}
-          className={`w-full h-auto ${isDarkMode ? 'text-background-lighter' : 'text-background-lightMode-lighter'}`}
-          locationClassName="cursor-pointer transition-colors duration-200"
-          onLocationMouseOver={(event: MapEvent) => {
-            const countryId = event.target.id;
-            setHoveredCountry(countryId);
-          }}
-          onLocationMouseOut={() => setHoveredCountry(null)}
-          locationStyle={(location: Location) => ({
-            fill: getCountryColor(location.id),
-            stroke: isDarkMode ? '#1a1a1a' : '#e5e5e5',
-            strokeWidth: 0.5
-          })}
-        />
+        <div className={`w-full h-[600px] rounded-lg overflow-hidden ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'}`}>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className={`text-lg ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`}>
+              Loading map data...
+            </div>
+          </div>
+        </div>
 
         {/* Legend */}
         <div className={`absolute bottom-4 right-4 p-4 rounded-lg ${isDarkMode ? 'bg-background/80' : 'bg-background-lightMode/80'} backdrop-blur-sm`}>
@@ -102,25 +66,6 @@ const Map: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* Tooltip */}
-        {hoveredCountry && (
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`absolute pointer-events-none px-3 py-2 rounded-lg text-sm ${
-              isDarkMode ? 'bg-background text-text' : 'bg-background-lightMode text-text-lightMode'
-            } shadow-lg`}
-            style={{
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)'
-            }}
-          >
-            {signupData.find(data => data.id === hoveredCountry)?.country || 'Unknown'}:{' '}
-            {signupData.find(data => data.id === hoveredCountry)?.count || 0} users
-          </motion.div>
-        )}
       </div>
     </motion.div>
   );
