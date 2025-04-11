@@ -11,6 +11,7 @@ import {
 } from 'react-simple-maps';
 import { scaleLinear } from 'd3-scale';
 import { Feature, GeometryObject } from 'geojson';
+import worldData from '../../data/world-110m.json';
 
 interface CountryData {
   code: string;
@@ -19,8 +20,6 @@ interface CountryData {
   region: string;
   coordinates: [number, number];
 }
-
-const geoUrl = "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
 const Map: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -130,7 +129,7 @@ const Map: React.FC = () => {
           }}
         >
           <ZoomableGroup>
-            <Geographies geography={geoUrl}>
+            <Geographies geography={worldData}>
               {({ geographies, error }: { geographies: Array<Feature<GeometryObject>>, error?: Error }) => {
                 if (error) {
                   setError(error.message);
