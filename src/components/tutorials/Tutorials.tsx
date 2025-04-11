@@ -1,6 +1,7 @@
 import React from 'react';
 import { PlayIcon } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
+import { useTheme } from '../../context/ThemeContext';
 
 const tutorials = [
   {
@@ -146,35 +147,37 @@ const tutorials = [
 ];
 
 const Tutorials: React.FC = () => {
+  const { isDarkMode } = useTheme();
+
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h2 className="text-2xl font-heading tracking-tight mb-6">Trading Tutorials</h2>
+        <h2 className={`text-2xl font-heading tracking-tight mb-6 ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>Trading Tutorials</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {tutorials.map((tutorial) => (
             <motion.div
               key={tutorial.id}
               whileHover={{ scale: 1.02 }}
-              className="card group hover:border-primary/20"
+              className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} rounded-2xl p-6 border ${isDarkMode ? 'border-white/[0.02]' : 'border-gray-200'} hover:border-primary/20 transition-all duration-300`}
             >
-              <div className="relative aspect-video mb-4 rounded-lg overflow-hidden bg-background-lighter">
+              <div className={`relative aspect-video mb-4 rounded-lg overflow-hidden ${isDarkMode ? 'bg-background-lighter' : 'bg-background-lightMode-lighter'}`}>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
+                  <div className={`w-16 h-16 rounded-full ${isDarkMode ? 'bg-primary/20' : 'bg-primary/10'} flex items-center justify-center group-hover:bg-primary/30 transition-colors`}>
                     <PlayIcon className="w-8 h-8 text-primary" />
                   </div>
                 </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-primary bg-primary/10 px-2 py-1 rounded-full">
+                  <span className={`text-sm text-primary ${isDarkMode ? 'bg-primary/10' : 'bg-primary/5'} px-2 py-1 rounded-full`}>
                     {tutorial.category}
                   </span>
-                  <span className="text-sm text-text-muted">{tutorial.duration}</span>
+                  <span className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`}>{tutorial.duration}</span>
                 </div>
-                <h3 className="text-lg font-medium text-text group-hover:text-primary transition-colors">
+                <h3 className={`text-lg font-medium ${isDarkMode ? 'text-text' : 'text-text-lightMode'} group-hover:text-primary transition-colors`}>
                   {tutorial.title}
                 </h3>
-                <p className="text-sm text-text-muted line-clamp-2">
+                <p className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} line-clamp-2`}>
                   {tutorial.description}
                 </p>
               </div>
