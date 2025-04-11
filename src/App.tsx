@@ -7,6 +7,7 @@ import DetailedStats from './components/statistics/DetailedStats';
 import Tutorials from './components/tutorials/Tutorials';
 import Calendar from './components/calendar/Calendar';
 import Leaderboard from './components/leaderboard/Leaderboard';
+import Settings from './components/settings/Settings';
 import Logo from './components/Logo';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 
@@ -38,6 +39,7 @@ const AppContent: React.FC = () => {
               <Route path="/tutorials" element={<Tutorials />} />
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
           </motion.div>
         </div>
