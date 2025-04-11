@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
-import { GlobeAltIcon } from '@heroicons/react/24/outline';
+import { GlobeAltIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import {
   ComposableMap,
   Geographies,
   Geography,
   ZoomableGroup,
-  Marker
+  Marker,
+  Position
 } from 'react-simple-maps';
 import { scaleLinear } from 'd3-scale';
 import { Feature, GeometryObject } from 'geojson';
@@ -29,6 +30,7 @@ const Map: React.FC = () => {
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [zoom, setZoom] = useState<number>(1);
 
   // Generate random signup data
   useEffect(() => {
@@ -80,11 +82,11 @@ const Map: React.FC = () => {
     return scaleLinear<string>()
       .domain([20, 50, 100, 150, 200])
       .range([
-        isDarkMode ? "rgba(255, 51, 75, 0.05)" : "rgba(255, 51, 75, 0.05)",
-        isDarkMode ? "rgba(255, 51, 75, 0.1)" : "rgba(255, 51, 75, 0.1)",
         isDarkMode ? "rgba(255, 51, 75, 0.15)" : "rgba(255, 51, 75, 0.15)",
-        isDarkMode ? "rgba(255, 51, 75, 0.2)" : "rgba(255, 51, 75, 0.2)",
-        isDarkMode ? "rgba(255, 51, 75, 0.25)" : "rgba(255, 51, 75, 0.25)"
+        isDarkMode ? "rgba(255, 51, 75, 0.25)" : "rgba(255, 51, 75, 0.25)",
+        isDarkMode ? "rgba(255, 51, 75, 0.35)" : "rgba(255, 51, 75, 0.35)",
+        isDarkMode ? "rgba(255, 51, 75, 0.45)" : "rgba(255, 51, 75, 0.45)",
+        isDarkMode ? "rgba(255, 51, 75, 0.55)" : "rgba(255, 51, 75, 0.55)"
       ]);
   }, [isDarkMode]);
 
@@ -93,7 +95,7 @@ const Map: React.FC = () => {
     if (country && (!selectedRegion || country.region === selectedRegion)) {
       return colorScale(country.users);
     }
-    return isDarkMode ? "#1a1a1a" : "#f5f5f5";
+    return isDarkMode ? "rgba(26, 26, 26, 0.6)" : "rgba(245, 245, 245, 0.6)";
   };
 
   const regions = Array.from(new Set(countries.map(c => c.region)));
@@ -103,58 +105,81 @@ const Map: React.FC = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`p-6 rounded-lg ${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'}`}
+      className={`p-8 rounded-xl ${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} shadow-lg`}
     >
-      <div className="flex items-center gap-3 mb-6">
-        <GlobeAltIcon className={`h-8 w-8 ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`} />
-        <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>
-          Global User Distribution
-        </h2>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'}`}>
+            <GlobeAltIcon className={`h-6 w-6 ${isDarkMode ? 'text-primary' : 'text-primary'}`} />
+          </div>
+          <div>
+            <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>
+              Global User Distribution
+            </h2>
+            <p className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`}>
+              {selectedRegion ? `Showing ${selectedRegion} region` : 'Showing all regions'}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Region filters */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        <button
+      <div className="flex flex-wrap gap-3 mb-8">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => setSelectedRegion(null)}
-          className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
             selectedRegion === null
-              ? 'bg-primary text-white'
+              ? 'bg-primary text-white shadow-md shadow-primary/20'
               : `${isDarkMode ? 'bg-background hover:bg-background-lighter' : 'bg-background-lightMode hover:bg-background-lightMode-lighter'} ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`
           }`}
         >
           All Regions
-        </button>
+        </motion.button>
         {regions.map(region => (
-          <button
+          <motion.button
             key={region}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setSelectedRegion(region)}
-            className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               selectedRegion === region
-                ? 'bg-primary text-white'
+                ? 'bg-primary text-white shadow-md shadow-primary/20'
                 : `${isDarkMode ? 'bg-background hover:bg-background-lighter' : 'bg-background-lightMode hover:bg-background-lightMode-lighter'} ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`
             }`}
           >
             {region}
-          </button>
+          </motion.button>
         ))}
       </div>
 
       {/* Map */}
-      <div className={`relative w-full h-[600px] rounded-lg overflow-hidden border ${
-        isDarkMode ? 'bg-background border-background-lighter' : 'bg-background-lightMode border-background-lightMode-lighter'
-      }`}>
+      <div className={`relative w-full h-[600px] rounded-xl overflow-hidden ${
+        isDarkMode ? 'bg-background' : 'bg-background-lightMode'
+      } shadow-inner`}>
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-opacity-75 bg-background z-10">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-background z-10"
+          >
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-          </div>
+          </motion.div>
         )}
         {error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-opacity-75 bg-background z-10">
-            <div className={`text-center p-4 rounded-lg ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>
-              <p className="text-lg font-semibold mb-2">Error loading map data</p>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-background z-10"
+          >
+            <div className={`text-center p-6 rounded-lg ${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} shadow-lg`}>
+              <p className="text-lg font-semibold mb-2 text-primary">Error loading map data</p>
               <p className="text-sm text-text-muted">{error}</p>
             </div>
-          </div>
+          </motion.div>
         )}
         <ComposableMap
           projection="geoMercator"
@@ -168,36 +193,39 @@ const Map: React.FC = () => {
             background: isDarkMode ? "#1a1a1a" : "#f5f5f5"
           }}
         >
-          <ZoomableGroup>
+          <ZoomableGroup
+            zoom={zoom}
+            onMoveEnd={(position: { coordinates: [number, number]; zoom: number }) => {
+              setZoom(position.zoom);
+            }}
+            minZoom={1}
+            maxZoom={4}
+            center={[0, 30]}
+          >
             <Geographies geography={worldData}>
-              {({ geographies, error }: { geographies: Array<Feature<GeometryObject>>, error?: Error }) => {
-                if (error) {
-                  setError(error.message);
-                  setIsLoading(false);
-                  return null;
-                }
-                setIsLoading(false);
-                return geographies.map((geo) => {
+              {({ geographies }) => 
+                geographies.map((geo) => {
                   const country = countries.find(c => c.name === geo.properties?.name);
                   return (
                     <Geography
                       key={geo.properties?.name || Math.random()}
                       geography={geo}
                       fill={getCountryColor(geo)}
-                      stroke={isDarkMode ? "#2a2a2a" : "#e5e5e5"}
+                      stroke={isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"}
                       strokeWidth={0.5}
                       style={{
                         default: { outline: "none" },
                         hover: { 
-                          fill: country ? colorScale(country.users + 20) : (isDarkMode ? "#2a2a2a" : "#e5e5e5"),
-                          transition: "all 0.3s ease"
+                          fill: country ? colorScale(country.users + 50) : (isDarkMode ? "#2a2a2a" : "#e5e5e5"),
+                          transition: "all 0.3s ease",
+                          cursor: "pointer"
                         },
                         pressed: { outline: "none" },
                       }}
                       onMouseEnter={(e) => {
                         if (country) {
                           const bounds = (e.target as SVGElement).getBoundingClientRect();
-                          setTooltipContent(`${country.name}: ${country.users} users`);
+                          setTooltipContent(`${country.name}: ${country.users.toLocaleString()} users`);
                           setTooltipPosition({ x: bounds.left, y: bounds.top });
                         }
                       }}
@@ -207,51 +235,56 @@ const Map: React.FC = () => {
                       }}
                     />
                   );
-                });
-              }}
+                })
+              }
             </Geographies>
           </ZoomableGroup>
         </ComposableMap>
 
-        {/* Tooltip */}
-        {tooltipContent && tooltipPosition && (
-          <div
-            className={`absolute px-3 py-2 rounded-lg text-sm ${
-              isDarkMode ? 'bg-background text-text' : 'bg-background-lightMode text-text-lightMode'
-            } shadow-lg pointer-events-none z-50`}
-            style={{
-              left: tooltipPosition.x,
-              top: tooltipPosition.y - 40,
-            }}
-          >
-            {tooltipContent}
-          </div>
-        )}
+        {/* Enhanced Tooltip */}
+        <AnimatePresence>
+          {tooltipContent && tooltipPosition && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              className={`absolute px-4 py-2.5 rounded-lg ${
+                isDarkMode ? 'bg-background-light text-text' : 'bg-background-lightMode-light text-text-lightMode'
+              } shadow-xl pointer-events-none z-50 backdrop-blur-sm`}
+              style={{
+                left: tooltipPosition.x,
+                top: tooltipPosition.y - 50,
+              }}
+            >
+              {tooltipContent}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Legend */}
-      <div className={`mt-6 p-4 rounded-lg ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'}`}>
-        <div className="flex items-center gap-6 text-sm">
-          <div className="flex items-center gap-1">
-            <div className="w-12 h-3 rounded bg-primary opacity-10"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'< 50 users'}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-12 h-3 rounded bg-primary opacity-15"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>50-100 users</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-12 h-3 rounded bg-primary opacity-20"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>100-150 users</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-12 h-3 rounded bg-primary opacity-25"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>150-200 users</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-12 h-3 rounded bg-primary opacity-30"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'>200 users'}</span>
-          </div>
+      {/* Modern Legend */}
+      <div className={`mt-8 p-6 rounded-xl ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'}`}>
+        <h3 className={`text-sm font-medium mb-4 ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`}>
+          User Density
+        </h3>
+        <div className="grid grid-cols-5 gap-4">
+          {[
+            { range: '< 50', opacity: 0.15 },
+            { range: '50-100', opacity: 0.25 },
+            { range: '100-150', opacity: 0.35 },
+            { range: '150-200', opacity: 0.45 },
+            { range: '200+', opacity: 0.55 }
+          ].map((item) => (
+            <div key={item.range} className="flex flex-col items-center gap-2">
+              <div 
+                className="w-full h-2 rounded-full bg-primary"
+                style={{ opacity: item.opacity }}
+              />
+              <span className={`text-xs ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`}>
+                {item.range}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </motion.div>
