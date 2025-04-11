@@ -34,7 +34,7 @@ const Map: React.FC = () => {
   useEffect(() => {
     const countryData: CountryData[] = [
       // Americas
-      { code: 'US', name: 'United States', region: 'Americas', coordinates: [-95.7129, 37.0902] as [number, number] },
+      { code: 'US', name: 'United States', region: 'Americas', coordinates: [-95.7129, 37.0902] as [number, number], users: 450 },
       { code: 'CA', name: 'Canada', region: 'Americas', coordinates: [-106.3468, 56.1304] as [number, number] },
       { code: 'BR', name: 'Brazil', region: 'Americas', coordinates: [-51.9253, -14.2350] as [number, number] },
       { code: 'MX', name: 'Mexico', region: 'Americas', coordinates: [-102.5528, 23.6345] as [number, number] },
@@ -69,10 +69,11 @@ const Map: React.FC = () => {
       { code: 'EG', name: 'Egypt', region: 'Africa', coordinates: [30.8025, 26.8206] as [number, number] },
       { code: 'NG', name: 'Nigeria', region: 'Africa', coordinates: [8.6753, 9.0820] as [number, number] },
       { code: 'KE', name: 'Kenya', region: 'Africa', coordinates: [37.9062, -0.0236] as [number, number] },
-      { code: 'MA', name: 'Morocco', region: 'Africa', coordinates: [-7.0926, 31.7917] as [number, number] }
+      { code: 'MA', name: 'Morocco', region: 'Africa', coordinates: [-7.0926, 31.7917] as [number, number] },
+      { code: 'DZ', name: 'Algeria', region: 'Africa', coordinates: [2.6327, 28.0339] as [number, number] }
     ].map(country => ({
       ...country,
-      users: Math.floor(Math.random() * 100) + 20 // Random number between 20-120
+      users: country.users || Math.floor(Math.random() * 100) + 20 // Use existing user count or generate random
     }));
 
     setCountries(countryData);
@@ -80,8 +81,15 @@ const Map: React.FC = () => {
 
   const colorScale = useMemo(() => {
     return scaleLinear<string>()
-      .domain([20, 120])
-      .range([isDarkMode ? "rgba(239, 68, 68, 0.2)" : "rgba(239, 68, 68, 0.1)", "rgba(239, 68, 68, 0.8)"]);
+      .domain([20, 100, 200, 300, 400, 500])
+      .range([
+        isDarkMode ? "rgba(239, 68, 68, 0.2)" : "rgba(239, 68, 68, 0.1)",
+        isDarkMode ? "rgba(239, 68, 68, 0.4)" : "rgba(239, 68, 68, 0.3)",
+        isDarkMode ? "rgba(239, 68, 68, 0.6)" : "rgba(239, 68, 68, 0.5)",
+        isDarkMode ? "rgba(239, 68, 68, 0.7)" : "rgba(239, 68, 68, 0.6)",
+        isDarkMode ? "rgba(239, 68, 68, 0.8)" : "rgba(239, 68, 68, 0.7)",
+        isDarkMode ? "rgba(239, 68, 68, 0.9)" : "rgba(239, 68, 68, 0.8)"
+      ]);
   }, [isDarkMode]);
 
   const getCountryColor = (geo: Feature<GeometryObject>) => {
@@ -229,15 +237,23 @@ const Map: React.FC = () => {
         <div className="flex items-center gap-6 text-sm">
           <div className="flex items-center gap-1">
             <div className="w-12 h-3 rounded bg-red-500 opacity-20"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'< 40 users'}</span>
+            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'< 100 users'}</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-12 h-3 rounded bg-red-500 opacity-50"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>40-80 users</span>
+            <div className="w-12 h-3 rounded bg-red-500 opacity-40"></div>
+            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>100-200 users</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-12 h-3 rounded bg-red-500 opacity-60"></div>
+            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>200-300 users</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-12 h-3 rounded bg-red-500 opacity-80"></div>
-            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'>80 users'}</span>
+            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>300-400 users</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-12 h-3 rounded bg-red-500 opacity-90"></div>
+            <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'>400 users'}</span>
           </div>
         </div>
       </div>
