@@ -12,6 +12,7 @@ import {
   ArrowTopRightOnSquareIcon,
   SunIcon,
   MoonIcon,
+  MapIcon,
 } from '@heroicons/react/24/outline';
 import Logo from '../Logo';
 import { useTheme } from '../../context/ThemeContext';
@@ -26,6 +27,7 @@ const Sidebar: React.FC = () => {
     { path: '/tutorials', icon: AcademicCapIcon, label: 'Tutorials' },
     { path: '/leaderboard', icon: TrophyIcon, label: 'Leaderboard' },
     { path: '/calendar', icon: CalendarIcon, label: 'Calendar' },
+    { path: '/map', icon: MapIcon, label: 'Global Users' },
     { path: '/settings', icon: Cog6ToothIcon, label: 'Settings' },
   ];
 

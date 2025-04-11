@@ -10,6 +10,7 @@ import Leaderboard from './components/leaderboard/Leaderboard';
 import Settings from './components/settings/Settings';
 import Logo from './components/Logo';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import Map from './components/map/Map';
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -40,6 +41,7 @@ const AppContent: React.FC = () => {
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/map" element={<Map />} />
             </Routes>
           </motion.div>
         </div>
