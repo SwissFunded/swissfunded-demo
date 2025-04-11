@@ -20,7 +20,7 @@ interface CountryData {
   coordinates: [number, number];
 }
 
-const geoUrl = "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries-sans-antarctica.json";
+const geoUrl = "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
 const Map: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -119,16 +119,17 @@ const Map: React.FC = () => {
           </div>
         )}
         <ComposableMap
-          projection="geoMercator"
+          projection="geoEqualEarth"
           projectionConfig={{
-            scale: 150
+            scale: 200,
+            center: [0, 0]
           }}
           style={{
             width: "100%",
             height: "100%"
           }}
         >
-          <ZoomableGroup center={[0, 20]} zoom={1}>
+          <ZoomableGroup>
             <Geographies geography={geoUrl}>
               {({ geographies, error }: { geographies: Array<Feature<GeometryObject>>, error?: Error }) => {
                 if (error) {
