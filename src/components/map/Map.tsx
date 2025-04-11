@@ -20,7 +20,7 @@ interface CountryData {
   coordinates: [number, number];
 }
 
-const geoUrl = "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
+const geoUrl = "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries-sans-antarctica.json";
 
 const Map: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -28,6 +28,8 @@ const Map: React.FC = () => {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [tooltipContent, setTooltipContent] = useState<string>('');
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Generate random signup data
   useEffect(() => {
@@ -103,6 +105,19 @@ const Map: React.FC = () => {
       <div className={`relative w-full h-[600px] rounded-lg overflow-hidden border ${
         isDarkMode ? 'bg-background border-background-lighter' : 'bg-background-lightMode border-background-lightMode-lighter'
       }`}>
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-opacity-75 bg-background z-10">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+          </div>
+        )}
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center bg-opacity-75 bg-background z-10">
+            <div className={`text-center p-4 rounded-lg ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>
+              <p className="text-lg font-semibold mb-2">Error loading map data</p>
+              <p className="text-sm text-text-muted">{error}</p>
+            </div>
+          </div>
+        )}
         <ComposableMap
           projection="geoMercator"
           projectionConfig={{
@@ -115,8 +130,14 @@ const Map: React.FC = () => {
         >
           <ZoomableGroup center={[0, 20]} zoom={1}>
             <Geographies geography={geoUrl}>
-              {({ geographies }: { geographies: Array<Feature<GeometryObject>> }) =>
-                geographies.map((geo) => (
+              {({ geographies, error }: { geographies: Array<Feature<GeometryObject>>, error?: Error }) => {
+                if (error) {
+                  setError(error.message);
+                  setIsLoading(false);
+                  return null;
+                }
+                setIsLoading(false);
+                return geographies.map((geo) => (
                   <Geography
                     key={geo.properties?.name || Math.random()}
                     geography={geo}
@@ -132,8 +153,8 @@ const Map: React.FC = () => {
                       pressed: { outline: "none" },
                     }}
                   />
-                ))
-              }
+                ));
+              }}
             </Geographies>
             {countries
               .filter(country => !selectedRegion || country.region === selectedRegion)
