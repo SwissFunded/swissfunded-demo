@@ -54,8 +54,16 @@ const Map: React.FC = () => {
   const colorScale = useMemo(() => {
     return scaleLinear<string>()
       .domain([20, 120])
-      .range(["rgba(239, 68, 68, 0.2)", "rgba(239, 68, 68, 1)"]);
-  }, []);
+      .range([isDarkMode ? "rgba(239, 68, 68, 0.2)" : "rgba(239, 68, 68, 0.1)", "rgba(239, 68, 68, 0.8)"]);
+  }, [isDarkMode]);
+
+  const getCountryColor = (geo: Feature<GeometryObject>) => {
+    const country = countries.find(c => c.name === geo.properties?.name);
+    if (country && (!selectedRegion || country.region === selectedRegion)) {
+      return colorScale(country.users);
+    }
+    return isDarkMode ? "#333333" : "#e5e5e5";
+  };
 
   const regions = Array.from(new Set(countries.map(c => c.region)));
 
@@ -118,10 +126,10 @@ const Map: React.FC = () => {
           </div>
         )}
         <ComposableMap
-          projection="geoEqualEarth"
+          projection="geoMercator"
           projectionConfig={{
-            scale: 200,
-            center: [0, 0]
+            scale: 130,
+            center: [0, 30]
           }}
           style={{
             width: "100%",
@@ -137,53 +145,39 @@ const Map: React.FC = () => {
                   return null;
                 }
                 setIsLoading(false);
-                return geographies.map((geo) => (
-                  <Geography
-                    key={geo.properties?.name || Math.random()}
-                    geography={geo}
-                    fill={isDarkMode ? "#333333" : "#e5e5e5"}
-                    stroke={isDarkMode ? "#444444" : "#d1d1d1"}
-                    strokeWidth={0.75}
-                    style={{
-                      default: { outline: "none" },
-                      hover: { 
-                        fill: isDarkMode ? "#444444" : "#d1d1d1",
-                        transition: "all 0.3s ease"
-                      },
-                      pressed: { outline: "none" },
-                    }}
-                  />
-                ));
+                return geographies.map((geo) => {
+                  const country = countries.find(c => c.name === geo.properties?.name);
+                  return (
+                    <Geography
+                      key={geo.properties?.name || Math.random()}
+                      geography={geo}
+                      fill={getCountryColor(geo)}
+                      stroke={isDarkMode ? "#444444" : "#d1d1d1"}
+                      strokeWidth={0.5}
+                      style={{
+                        default: { outline: "none" },
+                        hover: { 
+                          fill: country ? colorScale(country.users + 20) : (isDarkMode ? "#444444" : "#d1d1d1"),
+                          transition: "all 0.3s ease"
+                        },
+                        pressed: { outline: "none" },
+                      }}
+                      onMouseEnter={(e) => {
+                        if (country) {
+                          const bounds = (e.target as SVGElement).getBoundingClientRect();
+                          setTooltipContent(`${country.name}: ${country.users} users`);
+                          setTooltipPosition({ x: bounds.left, y: bounds.top });
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        setTooltipContent('');
+                        setTooltipPosition(null);
+                      }}
+                    />
+                  );
+                });
               }}
             </Geographies>
-            {countries
-              .filter(country => !selectedRegion || country.region === selectedRegion)
-              .map(({ name, coordinates, users }) => (
-                <Marker
-                  key={name}
-                  coordinates={coordinates}
-                  onMouseEnter={(e: React.MouseEvent<SVGElement>) => {
-                    const bounds = (e.target as SVGElement).getBoundingClientRect();
-                    setTooltipContent(`${name}: ${users} users`);
-                    setTooltipPosition({ x: bounds.left, y: bounds.top });
-                  }}
-                  onMouseLeave={() => {
-                    setTooltipContent('');
-                    setTooltipPosition(null);
-                  }}
-                >
-                  <circle
-                    r={Math.max(5, Math.min(users / 8, 10))}
-                    fill={colorScale(users)}
-                    stroke={isDarkMode ? "#ffffff" : "#000000"}
-                    strokeWidth={1.5}
-                    style={{
-                      transition: "all 0.3s ease",
-                      cursor: "pointer"
-                    }}
-                  />
-                </Marker>
-              ))}
           </ZoomableGroup>
         </ComposableMap>
 
@@ -207,15 +201,15 @@ const Map: React.FC = () => {
       <div className={`mt-6 p-4 rounded-lg ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'}`}>
         <div className="flex items-center gap-6 text-sm">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-red-500 opacity-20"></div>
+            <div className="w-12 h-3 rounded bg-red-500 opacity-20"></div>
             <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'< 40 users'}</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-red-500 opacity-60"></div>
+            <div className="w-12 h-3 rounded bg-red-500 opacity-50"></div>
             <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>40-80 users</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <div className="w-12 h-3 rounded bg-red-500 opacity-80"></div>
             <span className={isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}>{'>80 users'}</span>
           </div>
         </div>
