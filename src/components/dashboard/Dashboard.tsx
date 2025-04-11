@@ -15,6 +15,7 @@ import ChallengeCard from '../challenge/ChallengeCard';
 import { tradeData } from '../../data/tradeData';
 import { getTimeRangeData, calculateStats } from '../../utils/tradeDataUtils';
 import { motion } from 'framer-motion';
+import { useTheme } from '../../context/ThemeContext';
 
 ChartJS.register(
   CategoryScale,
@@ -29,6 +30,7 @@ ChartJS.register(
 
 const Dashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState<'1d' | '1w' | '1m' | '3m' | '6m'>('1m');
+  const { isDarkMode } = useTheme();
 
   const daysMap = useMemo(() => ({
     '1d': 1,
@@ -49,7 +51,7 @@ const Dashboard: React.FC = () => {
   const chartData = useMemo(() => {
     const isInProfit = currentData[currentData.length - 1].balance > currentData[0].balance;
     const isNoChange = currentData[currentData.length - 1].balance === currentData[0].balance;
-    const chartColor = isNoChange ? '#ffffff' : (isInProfit ? '#22c55e' : '#ef4444'); // White for no change, green for profit, red for loss
+    const chartColor = isNoChange ? '#ffffff' : (isInProfit ? '#22c55e' : '#ef4444');
     
     return {
       labels: currentData.map(d => {
@@ -141,10 +143,10 @@ const Dashboard: React.FC = () => {
         display: false
       },
       tooltip: {
-        backgroundColor: '#1F2937',
-        titleColor: 'rgba(255,255,255,0.7)',
-        bodyColor: '#ffffff',
-        borderColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: isDarkMode ? '#1F2937' : '#ffffff',
+        titleColor: isDarkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)',
+        bodyColor: isDarkMode ? '#ffffff' : '#000000',
+        borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
         borderWidth: 1,
         padding: 10,
         displayColors: false,
@@ -158,20 +160,20 @@ const Dashboard: React.FC = () => {
     scales: {
       x: {
         grid: {
-          color: 'rgba(255,255,255,0.1)',
+          color: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
           drawBorder: false,
         },
         ticks: {
-          color: 'rgba(255,255,255,0.5)',
+          color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
         }
       },
       y: {
         grid: {
-          color: 'rgba(255,255,255,0.1)',
+          color: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
           drawBorder: false,
         },
         ticks: {
-          color: 'rgba(255,255,255,0.5)',
+          color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
           callback: function(value: any) {
             return `$${value.toLocaleString()}`;
           }
@@ -203,28 +205,28 @@ const Dashboard: React.FC = () => {
         <motion.div 
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="bg-background-light p-6 rounded-xl"
+          className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} p-6 rounded-xl`}
         >
-          <h3 className="text-lg font-medium text-text-muted mb-2">Total Trades</h3>
-          <p className="text-2xl font-bold">{stats.totalTrades}</p>
-          <p className="text-sm text-text-muted mt-1">
+          <h3 className={`text-lg font-medium ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-2`}>Total Trades</h3>
+          <p className={`text-2xl font-bold ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{stats.totalTrades}</p>
+          <p className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mt-1`}>
             {stats.wins} Wins / {stats.losses} Losses
           </p>
         </motion.div>
         <motion.div 
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="bg-background-light p-6 rounded-xl"
+          className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} p-6 rounded-xl`}
         >
-          <h3 className="text-lg font-medium text-text-muted mb-2">Win Rate</h3>
-          <p className="text-2xl font-bold">{stats.winRate.toFixed(1)}%</p>
+          <h3 className={`text-lg font-medium ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-2`}>Win Rate</h3>
+          <p className={`text-2xl font-bold ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{stats.winRate.toFixed(1)}%</p>
         </motion.div>
         <motion.div 
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="bg-background-light p-6 rounded-xl"
+          className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} p-6 rounded-xl`}
         >
-          <h3 className="text-lg font-medium text-text-muted mb-2">Total PnL</h3>
+          <h3 className={`text-lg font-medium ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-2`}>Total PnL</h3>
           <p className={`text-2xl font-bold ${stats.totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
             ${stats.totalPnL.toLocaleString()}
           </p>
@@ -232,9 +234,9 @@ const Dashboard: React.FC = () => {
         <motion.div 
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="bg-background-light p-6 rounded-xl"
+          className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} p-6 rounded-xl`}
         >
-          <h3 className="text-lg font-medium text-text-muted mb-2">Percentage Gain</h3>
+          <h3 className={`text-lg font-medium ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-2`}>Percentage Gain</h3>
           <p className={`text-2xl font-bold ${stats.percentageGain >= 0 ? 'text-green-500' : 'text-red-500'}`}>
             {stats.percentageGain.toFixed(2)}%
           </p>
@@ -245,10 +247,10 @@ const Dashboard: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="bg-background-light rounded-xl p-6"
+        className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} rounded-xl p-6`}
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold">Balance History</h2>
+          <h2 className={`text-xl font-bold ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>Balance History</h2>
           <div className="flex gap-2">
             {['1d', '1w', '1m', '3m', '6m'].map((range) => (
               <motion.button
@@ -256,7 +258,11 @@ const Dashboard: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setTimeRange(range as any)}
-                className={`px-3 py-1 rounded ${timeRange === range ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
+                className={`px-3 py-1 rounded ${
+                  timeRange === range 
+                    ? 'bg-primary text-white' 
+                    : `${isDarkMode ? 'bg-background text-text-muted' : 'bg-background-lightMode text-text-lightMode-muted'}`
+                }`}
               >
                 {range.toUpperCase()}
               </motion.button>

@@ -19,6 +19,8 @@ import {
 import { Line } from 'react-chartjs-2';
 import { tradeData } from '../../data/tradeData';
 import { getTimeRangeData, calculateStats } from '../../utils/tradeDataUtils';
+import { motion } from 'framer-motion';
+import { useTheme } from '../../context/ThemeContext';
 
 ChartJS.register(
   CategoryScale,
@@ -34,6 +36,17 @@ ChartJS.register(
 
 const DetailedStats: React.FC = () => {
   const [timeRange, setTimeRange] = useState<'1d' | '1w' | '1m' | '3m' | '6m'>('1m');
+  const { isDarkMode } = useTheme();
+
+  const accountData = {
+    balance: 125000,
+    equity: 124850,
+    profit: '+3.75',
+    platform: 'MetaTrader 5',
+    accountType: 'Evaluation',
+    phase: 'Phase 1',
+    accountSize: 125000,
+  };
 
   const daysMap = useMemo(() => ({
     '1d': 1,
@@ -54,103 +67,22 @@ const DetailedStats: React.FC = () => {
   const chartData = useMemo(() => {
     const isInProfit = currentData[currentData.length - 1].balance > currentData[0].balance;
     const isNoChange = currentData[currentData.length - 1].balance === currentData[0].balance;
-    const chartColor = isNoChange ? '#ffffff' : (isInProfit ? '#22c55e' : '#ef4444'); // White for no change, green for profit, red for loss
+    const chartColor = isNoChange ? '#ffffff' : (isInProfit ? '#22c55e' : '#ef4444');
     
     return {
-      labels: currentData.map(d => {
-        const date = new Date(d.date);
-        return `${date.getMonth() + 1}/${date.getDate()}`;
-      }),
+      labels: currentData.map(d => d.date),
       datasets: [
         {
-          label: 'Balance',
           data: currentData.map(d => d.balance),
           borderColor: chartColor,
-          backgroundColor: isNoChange ? 'rgba(255, 255, 255, 0.1)' : (isInProfit ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'),
-          pointBackgroundColor: chartColor,
-          pointBorderColor: chartColor,
-          pointBorderWidth: 2,
-          pointRadius: (context: any) => {
-            const index = context.dataIndex;
-            if (index === 0) return 3; // Show first point
-            if (index === currentData.length - 1) return 3; // Show last point
-            
-            // Calculate the balance change
-            const balanceChange = Math.abs(currentData[index].balance - currentData[index - 1].balance);
-            const maxChange = Math.max(...currentData.map((d, i) => 
-              i > 0 ? Math.abs(d.balance - currentData[i - 1].balance) : 0
-            ));
-            
-            // Only show points where balance changed (trade occurred)
-            if (balanceChange === 0) return 0;
-            
-            // Scale point size based on the relative size of the change and timeframe
-            let baseSize, maxSize;
-            if (timeRange === '6m') {
-              baseSize = 1;
-              maxSize = 2;
-            } else if (timeRange === '3m') {
-              baseSize = 1.5;
-              maxSize = 2.5;
-            } else if (timeRange === '1m') {
-              baseSize = 2;
-              maxSize = 3;
-            } else {
-              baseSize = 2.5;
-              maxSize = 3.5;
-            }
-            
-            return baseSize + (balanceChange / maxChange) * (maxSize - baseSize);
-          },
-          pointHoverRadius: (context: any) => {
-            const index = context.dataIndex;
-            if (index === 0 || index === currentData.length - 1) return 4;
-            
-            const balanceChange = Math.abs(currentData[index].balance - currentData[index - 1].balance);
-            const maxChange = Math.max(...currentData.map((d, i) => 
-              i > 0 ? Math.abs(d.balance - currentData[i - 1].balance) : 0
-            ));
-            
-            if (balanceChange === 0) return 0;
-            
-            // Scale hover size based on timeframe
-            let baseSize, maxSize;
-            if (timeRange === '6m') {
-              baseSize = 1.5;
-              maxSize = 2.5;
-            } else if (timeRange === '3m') {
-              baseSize = 2;
-              maxSize = 3;
-            } else if (timeRange === '1m') {
-              baseSize = 2.5;
-              maxSize = 3.5;
-            } else {
-              baseSize = 3;
-              maxSize = 4;
-            }
-            
-            return baseSize + (balanceChange / maxChange) * (maxSize - baseSize);
-          },
+          backgroundColor: `${chartColor}10`,
+          borderWidth: 2,
           fill: true,
           tension: 0.4,
         }
       ]
     };
-  }, [currentData, timeRange]);
-
-  // Account data based on the latest trade data
-  const latestTrade = tradeData[tradeData.length - 1];
-  const accountData = {
-    balance: latestTrade.balance,
-    equity: latestTrade.balance,
-    profit: ((latestTrade.balance - tradeData[0].balance) / tradeData[0].balance * 100).toFixed(2),
-    platform: 'TRADELOCKER',
-    accountType: '2 STEP PRO',
-    phase: 'Student',
-    accountSize: tradeData[0].balance,
-    startDate: tradeData[0].date,
-    endDate: latestTrade.date,
-  };
+  }, [currentData]);
 
   const tradingStats = {
     averageWin: 2500,
@@ -159,7 +91,6 @@ const DetailedStats: React.FC = () => {
     profitFactor: 2.0,
   };
 
-  // Chart configurations
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -168,10 +99,10 @@ const DetailedStats: React.FC = () => {
         display: false
       },
       tooltip: {
-        backgroundColor: '#1F2937',
-        titleColor: 'rgba(255,255,255,0.7)',
-        bodyColor: '#ffffff',
-        borderColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: isDarkMode ? '#1F2937' : '#ffffff',
+        titleColor: isDarkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)',
+        bodyColor: isDarkMode ? '#ffffff' : '#000000',
+        borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
         borderWidth: 1,
         padding: 10,
         displayColors: false,
@@ -185,20 +116,20 @@ const DetailedStats: React.FC = () => {
     scales: {
       x: {
         grid: {
-          color: 'rgba(255,255,255,0.1)',
+          color: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
           drawBorder: false,
         },
         ticks: {
-          color: 'rgba(255,255,255,0.5)',
+          color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
         }
       },
       y: {
         grid: {
-          color: 'rgba(255,255,255,0.1)',
+          color: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
           drawBorder: false,
         },
         ticks: {
-          color: 'rgba(255,255,255,0.5)',
+          color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
           callback: function(value: any) {
             return `$${value.toLocaleString()}`;
           }
@@ -218,14 +149,14 @@ const DetailedStats: React.FC = () => {
     <div className="p-6 space-y-6">
       {/* Account Overview Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="col-span-2 bg-background-light rounded-xl p-6">
+        <div className={`col-span-2 ${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} rounded-xl p-6`}>
           <div className="flex justify-between items-start mb-6">
             <div className="flex items-center gap-3">
-              <div className="text-2xl font-heading">Account Balance</div>
-              <span className="text-3xl font-bold">${accountData.balance.toLocaleString()}</span>
+              <div className={`text-2xl font-heading ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>Account Balance</div>
+              <span className={`text-3xl font-bold ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>${accountData.balance.toLocaleString()}</span>
             </div>
             <div className="text-right">
-              <div className="text-sm text-text-muted">Equity: ${accountData.equity.toLocaleString()}</div>
+              <div className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`}>Equity: ${accountData.equity.toLocaleString()}</div>
               <div className={`flex items-center gap-1 ${Number(accountData.profit) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                 {Number(accountData.profit) >= 0 ? (
                   <ArrowUpIcon className="h-4 w-4" />
@@ -238,68 +169,51 @@ const DetailedStats: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-background p-4 rounded-lg">
+            <div className={`${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} p-4 rounded-lg`}>
               <div className="flex items-center justify-between">
-                <span className="text-text-muted">Platform</span>
-                <InformationCircleIcon className="h-5 w-5 text-text-muted" />
+                <span className={`${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`}>Platform</span>
+                <InformationCircleIcon className={`h-5 w-5 ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`} />
               </div>
-              <div className="mt-2 font-medium">{accountData.platform}</div>
+              <div className={`mt-2 font-medium ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{accountData.platform}</div>
             </div>
-            <div className="bg-background p-4 rounded-lg">
+            <div className={`${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} p-4 rounded-lg`}>
               <div className="flex items-center justify-between">
-                <span className="text-text-muted">Account Type</span>
-                <InformationCircleIcon className="h-5 w-5 text-text-muted" />
+                <span className={`${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`}>Account Type</span>
+                <InformationCircleIcon className={`h-5 w-5 ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`} />
               </div>
-              <div className="mt-2 font-medium">{accountData.accountType}</div>
+              <div className={`mt-2 font-medium ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{accountData.accountType}</div>
             </div>
-            <div className="bg-background p-4 rounded-lg">
+            <div className={`${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} p-4 rounded-lg`}>
               <div className="flex items-center justify-between">
-                <span className="text-text-muted">Phase</span>
-                <InformationCircleIcon className="h-5 w-5 text-text-muted" />
+                <span className={`${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`}>Phase</span>
+                <InformationCircleIcon className={`h-5 w-5 ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`} />
               </div>
-              <div className="mt-2 font-medium">{accountData.phase}</div>
+              <div className={`mt-2 font-medium ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>{accountData.phase}</div>
             </div>
-            <div className="bg-background p-4 rounded-lg">
+            <div className={`${isDarkMode ? 'bg-background' : 'bg-background-lightMode'} p-4 rounded-lg`}>
               <div className="flex items-center justify-between">
-                <span className="text-text-muted">Account size</span>
-                <InformationCircleIcon className="h-5 w-5 text-text-muted" />
+                <span className={`${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`}>Account size</span>
+                <InformationCircleIcon className={`h-5 w-5 ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'}`} />
               </div>
-              <div className="mt-2 font-medium">${accountData.accountSize.toLocaleString()}</div>
+              <div className={`mt-2 font-medium ${isDarkMode ? 'text-text' : 'text-text-lightMode'}`}>${accountData.accountSize.toLocaleString()}</div>
             </div>
           </div>
 
           <div className="mt-6">
             <div className="flex gap-4 mb-4">
-              <button
-                onClick={() => setTimeRange('1d')}
-                className={`px-4 py-2 rounded-lg ${timeRange === '1d' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
-              >
-                1D
-              </button>
-              <button
-                onClick={() => setTimeRange('1w')}
-                className={`px-4 py-2 rounded-lg ${timeRange === '1w' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
-              >
-                1W
-              </button>
-              <button
-                onClick={() => setTimeRange('1m')}
-                className={`px-4 py-2 rounded-lg ${timeRange === '1m' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
-              >
-                1M
-              </button>
-              <button
-                onClick={() => setTimeRange('3m')}
-                className={`px-4 py-2 rounded-lg ${timeRange === '3m' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
-              >
-                3M
-              </button>
-              <button
-                onClick={() => setTimeRange('6m')}
-                className={`px-4 py-2 rounded-lg ${timeRange === '6m' ? 'bg-primary text-white' : 'bg-background text-text-muted'}`}
-              >
-                6M
-              </button>
+              {['1d', '1w', '1m', '3m', '6m'].map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setTimeRange(range as any)}
+                  className={`px-4 py-2 rounded-lg ${
+                    timeRange === range 
+                      ? 'bg-primary text-white' 
+                      : `${isDarkMode ? 'bg-background text-text-muted' : 'bg-background-lightMode text-text-lightMode-muted'}`
+                  }`}
+                >
+                  {range.toUpperCase()}
+                </button>
+              ))}
             </div>
             <div className="h-[300px]">
               <Line data={chartData} options={chartOptions} />
