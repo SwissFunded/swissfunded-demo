@@ -34,7 +34,7 @@ const Map: React.FC = () => {
   useEffect(() => {
     const countryData: CountryData[] = [
       // Americas
-      { code: 'US', name: 'United States', region: 'Americas', coordinates: [-95.7129, 37.0902] as [number, number], users: 450 },
+      { code: 'US', name: 'United States of America', region: 'Americas', coordinates: [-95.7129, 37.0902] as [number, number], users: 450 },
       { code: 'CA', name: 'Canada', region: 'Americas', coordinates: [-106.3468, 56.1304] as [number, number] },
       { code: 'BR', name: 'Brazil', region: 'Americas', coordinates: [-51.9253, -14.2350] as [number, number] },
       { code: 'MX', name: 'Mexico', region: 'Americas', coordinates: [-102.5528, 23.6345] as [number, number] },
@@ -96,6 +96,10 @@ const Map: React.FC = () => {
     const country = countries.find(c => c.name === geo.properties?.name);
     if (country && (!selectedRegion || country.region === selectedRegion)) {
       return colorScale(country.users);
+    }
+    // Debug logging
+    if (geo.properties?.name?.includes('United States')) {
+      console.log('Found US in GeoJSON:', geo.properties.name);
     }
     return isDarkMode ? "#333333" : "#e5e5e5";
   };
