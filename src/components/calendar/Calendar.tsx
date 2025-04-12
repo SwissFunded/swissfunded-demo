@@ -393,7 +393,7 @@ const Calendar: React.FC = () => {
 
           {/* Date Range Filter */}
           <div className={`${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} rounded-lg p-4`}>
-            <div className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-2`}>Date Range</div>
+          So I like the app but in the global users there is an issue with the taskbar it looks off like the corner of the taskbar please change it and push it to get             <div className={`text-sm ${isDarkMode ? 'text-text-muted' : 'text-text-lightMode-muted'} mb-2`}>Date Range</div>
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="flex-1">
                 <input
