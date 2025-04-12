@@ -144,7 +144,7 @@ const Map: React.FC = () => {
       {/* Map */}
       <div 
         ref={mapRef}
-        className={`relative w-full h-[600px] rounded-xl overflow-hidden ${
+        className={`relative w-full h-[600px] rounded-2xl overflow-hidden ${
           isDarkMode ? 'bg-background' : 'bg-background-lightMode'
         } shadow-inner`}
       >
