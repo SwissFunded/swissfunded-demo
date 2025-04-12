@@ -100,7 +100,7 @@ const Map: React.FC = () => {
     <div className={`p-8 rounded-3xl ${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} shadow-lg`}>
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'}`}>
+          <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-background/40' : 'bg-background-lightMode/40'}`}>
             <GlobeAltIcon className={`h-6 w-6 ${isDarkMode ? 'text-primary' : 'text-primary'}`} />
           </div>
           <div>
