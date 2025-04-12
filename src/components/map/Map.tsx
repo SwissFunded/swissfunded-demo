@@ -97,7 +97,7 @@ const Map: React.FC = () => {
   const regions = Array.from(new Set(countries.map(c => c.region)));
 
   return (
-    <div className={`p-8 rounded-xl ${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} shadow-lg`}>
+    <div className={`p-8 rounded-3xl ${isDarkMode ? 'bg-background-light' : 'bg-background-lightMode-light'} shadow-lg`}>
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-background' : 'bg-background-lightMode'}`}>
@@ -144,7 +144,7 @@ const Map: React.FC = () => {
       {/* Map */}
       <div 
         ref={mapRef}
-        className={`relative w-full h-[600px] rounded-2xl overflow-hidden ${
+        className={`relative w-full h-[600px] rounded-3xl overflow-hidden ${
           isDarkMode ? 'bg-background' : 'bg-background-lightMode'
         } shadow-inner`}
       >
